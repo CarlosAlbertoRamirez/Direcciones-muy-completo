@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misión Urbana A2 | Your Mexican Friend</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#25d9ff;--magenta:#ff2bbf;--magenta2:#ff4fd8;
+  --bg1:#060018;--bg2:#130030;
+  --panel:#12042a;--text:#f0f0ff;--muted:#a8abce;
+  --good:#22c55e;--bad:#ef4444;--warn:#f59e0b;
+  --font:'DM Sans',system-ui,sans-serif;
+  --display:'Syne',system-ui,sans-serif;
+  --shadow:0 24px 48px rgba(0,0,0,.45),0 0 36px rgba(255,43,191,.10);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:radial-gradient(ellipse at 12% 12%,rgba(255,43,191,.13),transparent 28%),radial-gradient(ellipse at 88% 18%,rgba(37,217,255,.09),transparent 28%),linear-gradient(155deg,var(--bg1),var(--bg2));color:var(--text);min-height:100vh}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.app{width:min(1500px,98%);margin:14px auto 28px;display:flex;flex-direction:column;gap:12px}
+
+/* HERO */
+.hero{border-radius:22px;padding:20px 26px;background:linear-gradient(130deg,#0a0022,#1c0048 55%,#0c002e);border:1px solid rgba(255,255,255,.09);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:38px 38px;pointer-events:none}
+.hero-in{position:relative;z-index:1;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.logo{width:58px;height:58px;flex-shrink:0;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,#0c0030,#280060);border:2px solid rgba(37,217,255,.26);font-family:var(--display);font-size:1rem;font-weight:900;color:var(--magenta);text-shadow:1px 1px 0 var(--cyan)}
+.hero-text h1{font-family:var(--display);font-size:clamp(1.5rem,2.8vw,2.6rem);font-weight:900;line-height:.95;background:linear-gradient(90deg,#fff 25%,var(--cyan) 65%,var(--magenta));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-text p{color:var(--muted);font-size:.86rem;line-height:1.5;margin-top:5px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.badge{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:700;color:var(--muted)}
+.badge.c{border-color:rgba(37,217,255,.28);color:var(--cyan)}
+
+/* FULL-WIDTH MAP FIRST */
+.map-section{background:linear-gradient(180deg,rgba(16,3,36,.97),rgba(22,8,48,.97));border:1px solid rgba(37,217,255,.12);border-radius:20px;padding:14px;box-shadow:var(--shadow)}
+.map-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.map-top h2{font-family:var(--display);font-size:1.15rem;font-weight:800}
+.tabs{display:flex;gap:6px}
+.tab{border:0;border-radius:9px;padding:8px 14px;font-weight:800;font-family:var(--font);font-size:.82rem;cursor:pointer;transition:.18s}
+.tab.on{background:linear-gradient(135deg,var(--magenta),var(--magenta2));color:white;transform:translateY(-2px);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.tab.off{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid rgba(255,255,255,.09)}
+.tab.off:hover{background:rgba(255,255,255,.11);color:var(--text)}
+
+/* STATS ROW */
+.stats{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:8px 14px;display:flex;align-items:center;gap:8px}
+.stat span{color:var(--muted);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.stat strong{font-size:1.1rem;font-weight:800;color:var(--cyan);font-family:var(--display)}
+.stat.fire strong{color:var(--warn)}
+.xpw{flex:1;min-width:160px}
+.xpw .xb{height:5px;background:rgba(255,255,255,.08);border-radius:999px;margin-top:3px;overflow:hidden}
+.xpw .xbi{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--magenta));transition:width .5s}
+
+/* LEVEL PIPS */
+.lpips{display:flex;gap:5px;align-items:center;margin-bottom:10px}
+.pip{height:7px;border-radius:999px;transition:.4s;flex:1;max-width:60px}
+.pip.done{background:var(--good)}
+.pip.cur{background:var(--cyan);box-shadow:0 0 7px rgba(37,217,255,.5)}
+.pip.lock{background:rgba(255,255,255,.07)}
+.pip-lbl{font-family:var(--display);font-size:.75rem;font-weight:800;color:var(--muted);margin-left:6px;white-space:nowrap}
+
+/* THE BIG MAP */
+.map-wrap{border:2px solid rgba(37,217,255,.15);border-radius:16px;overflow:auto;background:#0b0120;cursor:default;min-height:500px}
+.map-wrap svg{display:block}
+
+/* BOTTOM GRID: instruction panel left, controls right */
+.bottom{display:grid;grid-template-columns:1fr 340px;gap:12px;margin-top:12px}
+.panel{background:linear-gradient(180deg,rgba(16,3,36,.97),rgba(22,8,48,.97));border:1px solid rgba(37,217,255,.12);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+
+/* INSTRUCTION */
+.sec-title{font-family:var(--display);font-size:1.1rem;font-weight:800;margin-bottom:3px}
+.sec-sub{color:var(--muted);font-size:.82rem;line-height:1.5;margin-bottom:10px}
+.instr-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:13px;margin-bottom:10px}
+.instr-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.ctitle{font-weight:800;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.diff{border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:800;display:inline-block}
+.d1{background:rgba(34,197,94,.13);color:#86efac;border:1px solid rgba(34,197,94,.22)}
+.d2{background:rgba(37,217,255,.12);color:var(--cyan);border:1px solid rgba(37,217,255,.20)}
+.d3{background:rgba(245,158,11,.12);color:#fcd34d;border:1px solid rgba(245,158,11,.20)}
+.d4{background:rgba(249,115,22,.12);color:#fdba74;border:1px solid rgba(249,115,22,.20)}
+.d5{background:rgba(239,68,68,.12);color:#fca5a5;border:1px solid rgba(239,68,68,.20)}
+
+.instr-text{font-size:.95rem;line-height:1.85;color:var(--text);font-weight:400}
+.instr-text b{color:var(--cyan);font-weight:700}
+.instr-text em{color:#fcd34d;font-style:normal;font-weight:700}
+
+.btn-audio{margin-top:10px;border:0;border-radius:9px;padding:7px 12px;font-weight:800;font-family:var(--font);font-size:.78rem;cursor:pointer;background:rgba(37,217,255,.10);color:var(--cyan);border:1px solid rgba(37,217,255,.20);display:inline-flex;align-items:center;gap:5px;transition:.15s}
+.btn-audio.pl{background:rgba(37,217,255,.2);animation:ap 1s infinite}
+@keyframes ap{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* WAYPOINT LIST */
+.wp-list{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.wp-item{display:flex;align-items:center;gap:8px;font-size:.83rem;font-weight:600;padding:6px 9px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);transition:.3s;color:var(--muted)}
+.wp-item.done{background:rgba(34,197,94,.09);border-color:rgba(34,197,94,.2);color:#86efac;text-decoration:line-through;opacity:.65}
+.wp-item.active{background:rgba(245,158,11,.09);border-color:rgba(245,158,11,.22);color:#fcd34d}
+.wp-item.final{border-color:rgba(255,43,191,.22);color:#f9a8d4}
+.wp-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-done{background:var(--good)}
+.dot-active{background:var(--warn);box-shadow:0 0 5px rgba(245,158,11,.5)}
+.dot-pend{background:rgba(255,255,255,.18)}
+.dot-final{background:var(--magenta)}
+
+/* FEEDBACK */
+.fb{display:none;padding:11px 13px;border-radius:12px;font-size:.86rem;line-height:1.65;margin-bottom:10px}
+.fb.show{display:block}
+.fb.good{background:rgba(34,197,94,.12);border-left:4px solid var(--good);color:#bbf7d0}
+.fb.bad{background:rgba(239,68,68,.11);border-left:4px solid var(--bad);color:#fecaca}
+.fb.neu{background:rgba(37,217,255,.10);border-left:4px solid var(--cyan);color:#bfdbfe}
+.fb.load{background:rgba(245,158,11,.08);border-left:4px solid var(--warn);color:#fde68a;font-style:italic}
+
+/* ACTIONS */
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.btn{border:0;border-radius:9px;padding:9px 13px;font-weight:800;font-family:var(--font);font-size:.8rem;cursor:pointer;transition:.15s;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0);box-shadow:none}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.bm{background:linear-gradient(135deg,var(--magenta),var(--magenta2));color:white}
+.bc{background:linear-gradient(135deg,var(--cyan),#00bfff);color:#071118}
+.bw{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#1a0d00}
+.bg{background:rgba(255,255,255,.07);color:var(--text);border:1px solid rgba(37,217,255,.14)}
+.bd{background:#0b0220;color:var(--muted);border:1px solid rgba(255,255,255,.08)}
+
+/* CONTROLS PANEL */
+.dpad{display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(3,48px);gap:6px;justify-content:center;margin:10px 0}
+.dp{border:0;border-radius:10px;background:rgba(255,255,255,.10);color:white;font-size:.95rem;cursor:pointer;transition:.15s;border:1px solid rgba(255,255,255,.11)}
+.dp:hover{background:rgba(255,255,255,.18);transform:scale(1.06)}
+.dp:active{transform:scale(.92)}
+.dpc{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.10);border-radius:10px;display:grid;place-items:center;font-size:1.1rem}
+.vocab{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.vocab span{background:rgba(37,217,255,.09);border:1px solid rgba(37,217,255,.18);border-radius:999px;padding:2px 8px;font-size:.7rem;color:var(--cyan);font-weight:700}
+
+/* GIVE MODE */
+textarea{width:100%;min-height:130px;border:2px solid rgba(37,217,255,.16);background:rgba(0,0,0,.25);color:var(--text);border-radius:11px;padding:10px 12px;font-size:.9rem;font-family:var(--font);resize:vertical;outline:none;line-height:1.65;transition:.2s;margin-bottom:8px}
+textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08)}
+.model-box{display:none;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:11px;font-size:.84rem;line-height:1.65;color:var(--muted);margin-top:8px}
+
+/* CONFETTI */
+.conf-wrap{position:absolute;inset:0;pointer-events:none;z-index:99;overflow:hidden;border-radius:14px}
+.cf{position:absolute;width:8px;height:8px;border-radius:2px;opacity:0;animation:cfDrop 1.3s ease forwards}
+@keyframes cfDrop{0%{opacity:1;transform:translateY(-8px) rotate(0)}100%{opacity:0;transform:translateY(300px) rotate(580deg)}}
+
+/* AVATAR (on SVG map — rendered as foreignObject / overlay div) */
+#avatarEl{position:absolute;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:1.4rem;background:linear-gradient(135deg,var(--magenta),#fb7185);border:3px solid white;box-shadow:0 6px 16px rgba(0,0,0,.35),0 0 14px rgba(255,43,191,.3);z-index:50;cursor:grab;user-select:none;touch-action:none;pointer-events:all;transition:left .13s ease,top .13s ease}
+#avatarEl.drag{cursor:grabbing;transition:none;transform:scale(1.1)}
+#avatarEl.arrived{animation:arrv .6s ease}
+@keyframes arrv{0%{transform:scale(1)}35%{transform:scale(1.38)}65%{transform:scale(.92)}100%{transform:scale(1)}}
+#avatarEl.wphit{animation:wph .4s ease}
+@keyframes wph{0%{transform:scale(1)}50%{transform:scale(1.28) rotate(6deg)}100%{transform:scale(1)}}
+
+@media(max-width:900px){.bottom{grid-template-columns:1fr}}
+@media(max-width:640px){.stats{gap:5px}.hero{padding:16px 14px}}
+</style>
+</head>
+<body>
+<div class="app">
+<h1 class="sr-only">Misión Urbana A2 — práctica de direcciones con mapa grande, rotondas y puentes</h1>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-in">
+    <div class="logo" aria-hidden="true">YMF</div>
+    <div class="hero-text">
+      <h1>Misión Urbana A2</h1>
+      <p>Navega por la ciudad. Sigue rutas continuas con rotondas, puentes, parques y más elementos urbanos.</p>
+      <div class="badges">
+        <span class="badge c">Español A2</span>
+        <span class="badge">Rotondas · Puentes · Túneles</span>
+        <span class="badge">Instrucciones continuas</span>
+        <span class="badge">Evaluación con IA</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MAP SECTION (full width) -->
+<section class="map-section" aria-label="Mapa interactivo de la ciudad">
+  <div class="map-top">
+    <div>
+      <h2 id="mapTitle" style="font-family:var(--display);font-size:1.15rem;font-weight:800">Ciudad Interactiva</h2>
+      <p style="color:var(--muted);font-size:.76rem;margin-top:1px" id="mapMeta"></p>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="lpips" id="lpips"></div>
+      <div class="tabs" role="tablist">
+        <button class="tab on" id="followBtn" role="tab" aria-selected="true">Modo 1: seguir</button>
+        <button class="tab off" id="giveBtn" role="tab" aria-selected="false">Modo 2: explicar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span>Nivel</span><strong id="sLevel">1</strong></div>
+    <div class="stat xpw"><span>XP</span><strong id="sXP">0</strong><div class="xb"><div class="xbi" id="xbi" style="width:0%"></div></div></div>
+    <div class="stat" id="sSt"><span>Racha</span><strong id="sStreak">0</strong></div>
+    <div class="stat"><span>Reto</span><strong id="sCounter">1</strong></div>
+  </div>
+
+  <!-- THE MAP -->
+  <div class="map-wrap" id="mapWrap">
+    <div style="position:relative;display:inline-block">
+      <svg id="mapSvg" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="avatarEl" role="img" aria-label="Personaje, muévelo al destino">🧍</div>
+      <div class="conf-wrap" id="confWrap" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<!-- BOTTOM PANELS -->
+<div class="bottom">
+  <!-- LEFT: INSTRUCTIONS -->
+  <div class="panel" id="followBox" role="tabpanel">
+    <h2 class="sec-title">Modo 1: sigue la ruta</h2>
+    <p class="sec-sub">Lee las instrucciones como si fueran un GPS. Visita cada parada en orden y llega al destino.</p>
+
+    <div class="instr-card" id="instrCard">
+      <div class="instr-head">
+        <span class="ctitle">Misión</span>
+        <span class="diff" id="diffBadge"></span>
+      </div>
+      <div class="instr-text" id="instrText" aria-live="polite"></div>
+      <button class="btn-audio" id="audioBtn" aria-label="Escuchar instrucciones">🔊 <span id="audioTxt">Escuchar</span></button>
+    </div>
+
+    <div class="wp-list" id="wpList" aria-live="polite"></div>
+
+    <div class="fb" id="fb1" role="alert"></div>
+    <div class="actions">
+      <button class="btn bw" id="hintBtn">💡 Pista</button>
+      <button class="btn bg" id="resetBtn">↺ Reiniciar</button>
+      <button class="btn bc" id="checkBtn">✓ Revisar</button>
+      <button class="btn bd" id="nextBtn">Siguiente →</button>
+    </div>
+    <div style="margin-top:10px">
+      <div class="ctitle" style="margin-bottom:6px">Vocabulario de rutas</div>
+      <div class="vocab">
+        <span>sigue derecho</span><span>gira a la derecha</span><span>gira a la izquierda</span>
+        <span>da vuelta en la rotonda</span><span>cruza el puente</span><span>pasa el túnel</span>
+        <span>camina N cuadras</span><span>cuando llegues a…</span><span>detente en…</span>
+        <span>al final de la calle</span><span>en la esquina de…</span><span>frente a…</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTROLS -->
+  <div class="panel" id="controlBox">
+    <!-- MODE 1 controls -->
+    <div id="mode1ctrl">
+      <div class="ctitle" style="margin-bottom:6px">Controles</div>
+      <div class="dpad" role="group" aria-label="Dirección">
+        <div></div><button class="dp" id="up" aria-label="Arriba">⬆️</button><div></div>
+        <button class="dp" id="left" aria-label="Izquierda">⬅️</button>
+        <div class="dpc" aria-hidden="true">🧍</div>
+        <button class="dp" id="right" aria-label="Derecha">➡️</button>
+        <div></div><button class="dp" id="down" aria-label="Abajo">⬇️</button><div></div>
+      </div>
+      <p style="color:var(--muted);font-size:.74rem;text-align:center;margin-bottom:10px">También: flechas del teclado o arrastra el monito.</p>
+    </div>
+
+    <!-- MODE 2 controls -->
+    <div id="mode2ctrl" style="display:none">
+      <div class="sec-title">Modo 2: da direcciones</div>
+      <p class="sec-sub">Escribe la ruta completa con todas las paradas. La IA evalúa.</p>
+      <div class="instr-card">
+        <div class="instr-head">
+          <span class="ctitle">Situación</span>
+          <span class="diff" id="giveDiff"></span>
+        </div>
+        <div class="instr-text" id="givePrompt" aria-live="polite"></div>
+      </div>
+      <label for="answer" class="sr-only">Escribe tu ruta aquí</label>
+      <textarea id="answer" placeholder="Sal de la estación. Camina dos cuadras a la derecha por Av. Principal. Da vuelta en la rotonda y toma la segunda salida hacia Av. Norte. Cruza el puente. Detente en la farmacia…"></textarea>
+      <div class="fb" id="fb2" role="alert"></div>
+      <div class="actions" style="flex-wrap:wrap">
+        <button class="btn bw" id="modelBtn">Ver modelo</button>
+        <button class="btn bg" id="clearBtn">Limpiar</button>
+        <button class="btn bc" id="checkGiveBtn">Revisar con IA ✦</button>
+        <button class="btn bd" id="nextGiveBtn">Siguiente →</button>
+      </div>
+      <div class="model-box" id="modelBox"></div>
+    </div>
+  </div>
+</div>
+
+<p style="text-align:center;color:#606090;font-size:.78rem;font-weight:700;margin:2px 0 0">By <span style="color:var(--magenta2)">Carlos & Denisse</span> · Your Mexican Friend</p>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   MAP DATA
+   The city is drawn as an SVG. Grid cells are 130px.
+   Nodes (intersections + special) are named keys.
+   Special elements: roundabout, bridge, tunnel, park, plaza
+═══════════════════════════════════════════════════ */
+
+// Cell size and map origin
+const CS = 130; // cell size px
+const OX = 60;  // left padding
+const OY = 60;  // top padding
+const COLS_N = 6;
+const ROWS_N = 5;
+const MAP_W = OX + COLS_N * CS + OX;  // 840
+const MAP_H = OY + ROWS_N * CS + OY;  // 770
+
+// Grid: col 0-6, row 0-5 → pixel x = OX + col*CS, y = OY + row*CS
+function gx(c){ return OX + c * CS; }
+function gy(r){ return OY + r * CS; }
+
+// Named intersections (key → {c, r, special?})
+const NODES = {
+  // row 0 (Av. del Sol)
+  n00:{c:0,r:0}, n10:{c:1,r:0}, n20:{c:2,r:0}, n30:{c:3,r:0}, n40:{c:4,r:0}, n50:{c:5,r:0}, n60:{c:6,r:0},
+  // row 1 (Av. Hidalgo)
+  n01:{c:0,r:1}, n11:{c:1,r:1}, n21:{c:2,r:1}, n31:{c:3,r:1}, n41:{c:4,r:1}, n51:{c:5,r:1}, n61:{c:6,r:1},
+  // row 2 (Av. Morelos) — has bridge over col 3
+  n02:{c:0,r:2}, n12:{c:1,r:2}, n22:{c:2,r:2}, n32:{c:3,r:2}, n42:{c:4,r:2}, n52:{c:5,r:2}, n62:{c:6,r:2},
+  // row 3 (Av. Juárez)
+  n03:{c:0,r:3}, n13:{c:1,r:3}, n23:{c:2,r:3}, n33:{c:3,r:3}, n43:{c:4,r:3}, n53:{c:5,r:3}, n63:{c:6,r:3},
+  // row 4 (Av. Insurgentes)
+  n04:{c:0,r:4}, n14:{c:1,r:4}, n24:{c:2,r:4}, n34:{c:3,r:4}, n44:{c:4,r:4}, n54:{c:5,r:4}, n64:{c:6,r:4},
+  // row 5 (Av. Universidad)
+  n05:{c:0,r:5}, n15:{c:1,r:5}, n25:{c:2,r:5}, n35:{c:3,r:5}, n45:{c:4,r:5}, n55:{c:5,r:5}, n65:{c:6,r:5},
+};
+
+// Street names
+const H_STREETS = [
+  {r:0, name:'Av. del Sol'},
+  {r:1, name:'Av. Hidalgo'},
+  {r:2, name:'Av. Morelos'},
+  {r:3, name:'Av. Juárez'},
+  {r:4, name:'Av. Insurgentes'},
+  {r:5, name:'Av. Universidad'},
+];
+const V_STREETS = [
+  {c:0, name:'C. Poniente'},
+  {c:1, name:'C. Norte'},
+  {c:2, name:'C. Roble'},
+  {c:3, name:'C. del Río'},
+  {c:4, name:'C. Flores'},
+  {c:5, name:'C. Oriente'},
+  {c:6, name:'C. Sur'},
+];
+
+// Special urban elements (pixel position, type, label)
+const SPECIALS = [
+  // Roundabouts — at key intersections
+  {type:'roundabout', c:3, r:1, label:'Glorieta Hidalgo'},
+  {type:'roundabout', c:2, r:3, label:'Glorieta Juárez'},
+  {type:'roundabout', c:5, r:4, label:'Glorieta Insurgentes'},
+  // Bridges — horizontal road segment between two cols
+  {type:'bridge', c1:2, c2:3, r:2, label:'Puente del Río'},
+  {type:'bridge', c1:4, c2:5, r:4, label:'Puente Flores'},
+  // Tunnel — vertical segment between two rows
+  {type:'tunnel', c:1, r1:2, r2:3, label:'Túnel Norte'},
+  // Park — fills a block (not on road)
+  {type:'park', c:4, r:0, label:'Parque Central'},
+  // Plaza
+  {type:'plaza', c:0, r:2, label:'Plaza Cívica'},
+];
+
+// Places (destinations / waypoints) — positioned between intersections or at nodes
+const PLACES = [
+  // top strip
+  {key:'estacion',   icon:'🚉', name:'Estación',    c:0, r:0, offX:-10, offY:-50},
+  {key:'banco',      icon:'🏦', name:'Banco',        c:2, r:0, offX:10,  offY:-50},
+  {key:'escuela',    icon:'🏫', name:'Escuela',      c:5, r:0, offX:0,   offY:-50},
+  // row 1
+  {key:'cafeteria',  icon:'☕', name:'Café',         c:1, r:1, offX:-60, offY:10},
+  {key:'farmacia',   icon:'💊', name:'Farmacia',     c:4, r:1, offX:20,  offY:10},
+  {key:'museo',      icon:'🖼️', name:'Museo',        c:6, r:1, offX:10,  offY:-50},
+  // row 2
+  {key:'hospital',   icon:'🏥', name:'Hospital',     c:0, r:2, offX:-10, offY:10},
+  {key:'biblioteca', icon:'📚', name:'Biblioteca',   c:5, r:2, offX:10,  offY:10},
+  // row 3
+  {key:'hotel',      icon:'🏨', name:'Hotel',        c:3, r:3, offX:20,  offY:10},
+  {key:'restaurante',icon:'🍽️', name:'Restaurante', c:6, r:3, offX:10,  offY:10},
+  // row 4
+  {key:'gimnasio',   icon:'🏋️', name:'Gimnasio',    c:0, r:4, offX:-10, offY:10},
+  {key:'teatro',     icon:'🎭', name:'Teatro',       c:3, r:4, offX:10,  offY:-50},
+  // row 5
+  {key:'metro',      icon:'🚇', name:'Metro',        c:1, r:5, offX:-10, offY:20},
+  {key:'mercado',    icon:'🛍️', name:'Mercado',      c:4, r:5, offX:10,  offY:20},
+  {key:'aeropuerto', icon:'✈️', name:'Aeropuerto',  c:6, r:5, offX:10,  offY:20},
+];
+
+/* ═══════════════════════════════════════════════════
+   CHALLENGES — continuous GPS-style instructions
+   waypoints: visited in order BEFORE target
+   route: array of node keys the monito should traverse
+═══════════════════════════════════════════════════ */
+const CHALLENGES = [
+
+/* ── MISIÓN 1 ── Nivel 2 · La medicina urgente ── */
+{
+  level:2, diff:2, xp:16,
+  start:'n00', waypoints:['n41'], target:'n52',
+  placeStart:'estacion', placeWaypoints:['farmacia'], placeTarget:'biblioteca',
+  text:`Llegas en tren a la <b>estación</b> y tu abuela te llama por teléfono. Necesita su medicina con urgencia. Sal de la estación y camina cuatro cuadras a la derecha por <b>Av. del Sol</b>. Vas a pasar el café, luego el banco, después C. Roble y finalmente llegas a <b>C. Flores</b>. En esa esquina, baja una cuadra por C. Flores hacia <b>Av. Hidalgo</b>. Ahí está la <em>farmacia</em> — entra, paga la medicina y guárdala bien en tu mochila. Cuando salgas de la farmacia, gira a la derecha y camina una cuadra más por Av. Hidalgo hasta llegar a <b>C. Oriente</b>. Ahí, al final de la calle, está la <em>biblioteca</em>. Tu abuela trabaja ahí y te espera. Dos paradas: farmacia primero, biblioteca después. ¿Puedes encontrar el camino?`,
+  hint:'Derecha 4 cuadras por Av. del Sol → C. Flores → baja 1 (farmacia) → derecha 1 (biblioteca).'
+},
+
+/* ── MISIÓN 2 ── Nivel 2 · La Glorieta Hidalgo ── */
+{
+  level:2, diff:2, xp:16,
+  start:'n10', waypoints:['n31'], target:'n33',
+  placeStart:'cafeteria', placeWaypoints:['glorieta_hidalgo'], placeTarget:'hotel',
+  text:`Estás tomando un café en el <b>café</b>, en la esquina de C. Norte y Av. Hidalgo. Un amigo te manda un mensaje: "Te espero en el hotel, date prisa." Sal del café y camina dos cuadras a la derecha por <b>Av. Hidalgo</b>. Vas a pasar C. Roble y llegas a <b>C. del Río</b>. Aquí está la famosa <em>Glorieta Hidalgo</em>. Fíjate bien: en la glorieta debes dar vuelta y tomar la <b>primera salida hacia abajo</b>, que es C. del Río hacia el sur. Baja dos cuadras por C. del Río. Vas a cruzar Av. Morelos y llegas a <b>Av. Juárez</b>. Gira a la derecha en Av. Juárez y camina una cuadra. El <em>hotel</em> está justo en la esquina de Av. Juárez y C. del Río. Entra al lobby y busca a tu amigo en la recepción. ¡No llegues tarde!`,
+  hint:'Derecha 2 por Av. Hidalgo → Glorieta Hidalgo → baja 2 por C. del Río → derecha 1 (hotel).'
+},
+
+/* ── MISIÓN 3 ── Nivel 3 · El Puente del Río ── */
+{
+  level:3, diff:3, xp:20,
+  start:'n02', waypoints:['n32', 'n52'], target:'n53',
+  placeStart:'hospital', placeWaypoints:['puente_rio','biblioteca'], placeTarget:'hotel',
+  text:`Eres enfermero y sales del <b>hospital</b> con unos documentos importantes. Primero necesitas cruzar el río. Sal del hospital y camina dos cuadras a la derecha por <b>Av. Morelos</b>. Llegas a <b>C. del Río</b>: aquí empieza el <em>Puente del Río</em>. Crúzalo despacio — mira el agua debajo, el río es ancho y bonito. Cuando termines de cruzar el puente, sigues por Av. Morelos. Camina dos cuadras más a la derecha. Vas a pasar C. Flores y llegas a <b>C. Oriente</b>. Ahí, en esa esquina, está la <em>biblioteca</em>. Deja los documentos en la biblioteca — es muy importante. Cuando salgas, baja una cuadra por C. Oriente hasta <b>Av. Juárez</b>. Gira a la izquierda y camina una cuadra hacia C. Flores. El <em>hotel</em> está en esa esquina. Ve a descansar, ¡tienes un día largo!`,
+  hint:'Derecha 2 (puente) → derecha 2 más (biblioteca) → baja 1 → izquierda 1 (hotel).'
+},
+
+/* ── MISIÓN 4 ── Nivel 3 · El Túnel Norte ── */
+{
+  level:3, diff:3, xp:20,
+  start:'n12', waypoints:['n13'], target:'n23',
+  placeStart:'cafeteria', placeWaypoints:['tunel_norte'], placeTarget:'hotel',
+  text:`Sales del <b>café</b> en la esquina de C. Norte y Av. Morelos. Quieres ir al hotel pero hay mucho tráfico en la superficie. Una persona en la calle te dice: "Use el túnel, es más rápido." Buscas la entrada del <em>Túnel Norte</em> — está justo aquí, en C. Norte, debajo de la calle. Entra al túnel y camina una cuadra hacia abajo, por C. Norte, bajo tierra. Hay luces amarillas en el techo y el sonido de los pasos hace eco. Cuando salgas del otro lado del túnel llegas a <b>Av. Juárez</b>. Respira el aire fresco. Ahora gira a la derecha y camina una cuadra por Av. Juárez hacia <b>C. Roble</b>. El <em>hotel</em> está exactamente en esa esquina, con una entrada grande y un letrero luminoso. Entra y pregunta por tu habitación.`,
+  hint:'Entra al Túnel Norte → baja 1 cuadra bajo tierra → sale en Av. Juárez → derecha 1 (hotel).'
+},
+
+/* ── MISIÓN 5 ── Nivel 4 · Mañana con tres encargos ── */
+{
+  level:4, diff:4, xp:26,
+  start:'n00', waypoints:['n20', 'n31', 'n32'], target:'n52',
+  placeStart:'estacion', placeWaypoints:['banco','glorieta_hidalgo','puente_rio'], placeTarget:'biblioteca',
+  text:`Son las ocho de la mañana. Llegas en el primer tren del día a la <b>estación</b> y tienes tres encargos antes de llegar a la biblioteca. Sal de la estación y camina dos cuadras a la derecha por <b>Av. del Sol</b>. Llegas a <b>C. Roble</b> — ahí está el <em>banco</em>. Entra, saca dinero y paga una factura importante. Cuando salgas del banco, baja una cuadra por C. Roble. Llegas a <b>Av. Hidalgo</b> — justo aquí está la <em>Glorieta Hidalgo</em>. Fíjate bien en los carros que circulan. Da vuelta en la rotonda y toma la salida hacia abajo, por <b>C. del Río</b>. Baja una cuadra por C. del Río. Llegas a <b>Av. Morelos</b>. Aquí está el <em>Puente del Río</em>. Crúzalo — el río está debajo y el viento es fresco por las mañanas. Cuando termines de cruzar, sigues por Av. Morelos. Camina dos cuadras más a la derecha, hasta <b>C. Oriente</b>. Sube una cuadra por C. Oriente hasta Av. Hidalgo. La <em>biblioteca</em> está ahí, en la esquina. Son las nueve de la mañana y el encargado ya abrió. ¡Tres paradas en orden: banco, glorieta, puente!`,
+  hint:'Derecha 2 (banco C.Roble) → baja 1 (glorieta C.del Río) → baja 1 (puente Av.Morelos) → derecha 2 → sube 1 (biblioteca).'
+},
+
+/* ── MISIÓN 6 ── Nivel 4 · El vuelo urgente ── */
+{
+  level:4, diff:4, xp:26,
+  start:'n00', waypoints:['n04', 'n34'], target:'n65',
+  placeStart:'estacion', placeWaypoints:['gimnasio','teatro'], placeTarget:'aeropuerto',
+  text:`Tu teléfono suena a las seis de la mañana. Es tu jefa: "¡El vuelo sale en dos horas! ¡Muévete!" Sal corriendo de la <b>estación</b>. Primero necesitas recoger tu maleta en el gimnasio — la dejaste ahí ayer. Baja cuatro cuadras por <b>C. Poniente</b>. Vas a cruzar Av. Hidalgo, después Av. Morelos, después Av. Juárez y llegas a <b>Av. Insurgentes</b>. El <em>gimnasio</em> está en esa esquina. Entra rápido, recoge la maleta del casillero número siete y sal. Ahora camina tres cuadras a la derecha por <b>Av. Insurgentes</b>. Llegas a la <em>Glorieta Insurgentes</em> — hay mucho tráfico. Da vuelta en la rotonda con cuidado y toma la primera salida hacia la derecha. Llegas frente al <em>teatro</em>. Aquí tienes que recoger los boletos de avión — los dejaste en taquilla. Entra, recógelos y confirma tu nombre. Cuando salgas del teatro, camina dos cuadras más a la derecha por Av. Insurgentes. Llegas a <b>C. Sur</b>. Baja una cuadra por C. Sur hacia <b>Av. Universidad</b>. El <em>aeropuerto</em> está al fondo, con las puertas de cristal y los aviones detrás. ¡Corre, que el avión no espera!`,
+  hint:'Baja 4 por C.Poniente (gimnasio) → derecha 3 por Av.Insurgentes (glorieta→teatro) → derecha 2 → baja 1 por C.Sur (aeropuerto).'
+},
+
+/* ── MISIÓN 7 ── Nivel 5 · La ruta del mensajero ── */
+{
+  level:5, diff:5, xp:36,
+  start:'n60', waypoints:['n61', 'n31', 'n32', 'n52'], target:'n05',
+  placeStart:'museo', placeWaypoints:['farmacia','glorieta_hidalgo','puente_rio','biblioteca'], placeTarget:'metro',
+  text:`Eres mensajero y hoy tienes la ruta más larga de tu vida. Empiezas en el <b>museo</b>, en la esquina norte de C. Sur. Primero, baja una cuadra por <b>C. Sur</b> hasta <b>Av. Hidalgo</b>. Ahí, en esa esquina, está la <em>farmacia</em>. Entrega el paquete número uno — es una caja pequeña con vitaminas. Cuando salgas de la farmacia, camina cinco cuadras a la izquierda por <b>Av. Hidalgo</b>. Vas a pasar C. Flores, después C. del Río, y llegas a la <em>Glorieta Hidalgo</em>. Pon atención: en la glorieta, da vuelta en la rotonda y toma la salida hacia abajo, por <b>C. del Río</b>. Baja una cuadra por C. del Río hasta <b>Av. Morelos</b>. Aquí está el inicio del <em>Puente del Río</em>. Crúzalo despacio — el puente es angosto y hay ciclistas. Del otro lado del puente sigues por Av. Morelos. Camina dos cuadras a la derecha hasta <b>C. Oriente</b>. Sube una cuadra por C. Oriente. Llegas a la <em>biblioteca</em> — entrega el paquete número dos, son libros muy pesados. Descansa un momento. Cuando estés listo, baja dos cuadras por <b>C. Oriente</b> hasta <b>Av. Insurgentes</b>. Gira a la izquierda y camina cinco cuadras por Av. Insurgentes hacia <b>C. Poniente</b>. Baja dos cuadras por C. Poniente hasta <b>Av. Universidad</b>. Gira a la derecha y camina una cuadra. El <em>metro</em> está ahí. Entrega el último paquete al jefe de estación y termina tu turno. ¡Cuatro paradas, en orden, sin equivocarte!`,
+  hint:'Baja 1 (farmacia) → izquierda 5 Av.Hidalgo (glorieta) → baja 1 C.del Río (puente) → derecha 2 sube 1 (biblioteca) → baja 2 izquierda 5 baja 2 derecha 1 (metro).'
+},
+
+/* ── MISIÓN 8 ── Nivel 5 · La gran escapada ── */
+{
+  level:5, diff:5, xp:36,
+  start:'n05', waypoints:['n04', 'n54', 'n51', 'n21'], target:'n00',
+  placeStart:'metro', placeWaypoints:['gimnasio','mercado','restaurante','banco'], placeTarget:'estacion',
+  text:`Acabas de llegar en metro a la ciudad y tienes todo el día libre. Sal del <b>metro</b> en Av. Universidad esquina C. Poniente. Primero quieres hacer ejercicio — el <em>gimnasio</em> está a una cuadra de aquí. Sube una cuadra por <b>C. Poniente</b> hasta <b>Av. Insurgentes</b>. El gimnasio está en esa esquina. Haz ejercicio una hora. Cuando termines, camina cuatro cuadras a la derecha por <b>Av. Insurgentes</b> hasta <b>C. Oriente</b>. Ahí está el <em>mercado</em>. Entra y compra frutas, verduras y algo de queso para el camino. El mercado huele muy bien. Cuando termines de comprar, sube tres cuadras por <b>C. Oriente</b> hasta <b>Av. Hidalgo</b>. Gira a la izquierda. Camina tres cuadras por Av. Hidalgo hasta <b>C. Roble</b>. El <em>restaurante</em> está en esa esquina — come algo rico, tienes hambre después del gimnasio y el mercado. Pide el menú del día. Cuando termines de comer, camina una cuadra más a la izquierda por Av. Hidalgo hasta <b>C. Norte</b>. Sube una cuadra por C. Norte hasta <b>Av. del Sol</b>. Gira a la izquierda. Camina una cuadra. El <em>banco</em> está ahí — deposita el dinero del mercado que sobró. Finalmente, camina dos cuadras a la izquierda por <b>Av. del Sol</b>. La <em>estación</em> está al final, con el tren esperándote para regresar a casa. ¡Qué día tan completo!`,
+  hint:'Sube 1 (gimnasio) → derecha 4 Av.Insurgentes (mercado) → sube 3 C.Oriente, izquierda 3 Av.Hidalgo (restaurante) → izquierda 1 sube 1 izquierda 1 (banco) → izquierda 2 (estación).'
+},
+
+];
+
+const GIVE_CHALLENGES = [
+{
+  level:2, diff:2, xp:14,
+  from:'hospital', to:'farmacia', waypoints:['puente_rio'],
+  fromNode:'n02', toNode:'n41',
+  prompt:'Una persona sale del hospital con una receta médica. Necesita cruzar el Puente del Río para llegar a la farmacia. Escribe la ruta completa y continua, como si fuera un GPS: menciona las calles, el puente y el destino final. Usa frases largas y conectadas.',
+  model:'Sal del hospital en Av. Morelos esquina C. Poniente. Camina dos cuadras a la derecha por Av. Morelos. Llegas a C. del Río — aquí empieza el Puente del Río. Crúzalo despacio, el río está abajo. Cuando termines de cruzar, sigue por Av. Morelos una cuadra más a la derecha hasta C. Flores. Baja una cuadra por C. Flores hacia Av. Hidalgo. La farmacia está en esa esquina, con un letrero verde. Entra y entrega la receta.'
+},
+{
+  level:3, diff:3, xp:20,
+  from:'cafeteria', to:'teatro', waypoints:['glorieta_hidalgo'],
+  fromNode:'n10', toNode:'n34',
+  prompt:'Un estudiante está en el café y quiere ir al teatro para ver una obra de noche. Debe pasar por la Glorieta Hidalgo. Escribe instrucciones largas, detalladas y continuas, como si le explicaras a alguien que no conoce la ciudad. Describe qué va a ver en cada punto.',
+  model:'Sal del café en la esquina de C. Norte y Av. Hidalgo. Camina dos cuadras a la derecha por Av. Hidalgo — vas a pasar la Plaza Cívica a tu izquierda. Cuando llegues a C. del Río, llegas a la Glorieta Hidalgo. Es una rotonda grande con una fuente en el centro. Da vuelta en la rotonda y toma la primera salida hacia abajo, que es C. del Río hacia el sur. Baja dos cuadras por C. del Río. Vas a cruzar Av. Morelos y llegas a Av. Insurgentes. Gira a la derecha. Camina una cuadra por Av. Insurgentes hasta C. del Río. El teatro está en esa esquina, con unas puertas grandes y un letrero de colores. La obra empieza a las ocho.'
+},
+{
+  level:4, diff:4, xp:24,
+  from:'estacion', to:'hotel', waypoints:['banco','glorieta_hidalgo'],
+  fromNode:'n00', toNode:'n33',
+  prompt:'Un turista llega en tren con mucho equipaje. Necesita ir al banco primero a cambiar dinero, después pasar por la Glorieta Hidalgo y finalmente llegar al hotel a descansar. Escribe instrucciones muy largas y claras con todos los detalles del camino: calles, cuadras, la glorieta, qué hacer en cada parada.',
+  model:'Sal de la estación en Av. del Sol esquina C. Poniente. Camina dos cuadras a la derecha por Av. del Sol — vas a pasar C. Norte y llegas a C. Roble. Ahí está el banco, en la esquina derecha. Entra y cambia tu dinero. Cuando salgas, baja una cuadra por C. Roble hacia Av. Hidalgo. Llegas a la Glorieta Hidalgo — hay taxis y mucho movimiento. Da vuelta en la rotonda y toma la salida hacia abajo, por C. del Río. Baja dos cuadras por C. del Río. Primero cruzas Av. Morelos y después llegas a Av. Juárez. El hotel está exactamente aquí, en la esquina de Av. Juárez y C. del Río. Tiene una entrada grande con un portero. Entra y pide tu habitación en la recepción.'
+},
+{
+  level:5, diff:5, xp:32,
+  from:'gimnasio', to:'aeropuerto', waypoints:['glorieta_insurgentes','teatro','mercado'],
+  fromNode:'n04', toNode:'n65',
+  prompt:'Una persona sale del gimnasio con tres encargos antes de llegar al aeropuerto: pasar por la Glorieta Insurgentes, recoger un paquete en el teatro y comprar comida en el mercado. Escribe una ruta muy larga y detallada como si fuera un GPS con historia. Describe cada calle, cada vuelta, qué pasa en cada parada y cómo llega al aeropuerto al final.',
+  model:'Sal del gimnasio en Av. Insurgentes esquina C. Poniente. Camina tres cuadras a la derecha por Av. Insurgentes — vas a pasar C. Norte, C. Roble y llegas a C. del Río. Aquí está la Glorieta Insurgentes, una rotonda grande con árboles. Pon atención a los carros. Da vuelta en la rotonda y toma la primera salida hacia la derecha, que sigue por Av. Insurgentes hacia el este. Camina una cuadra. Llegas al teatro en la esquina de Av. Insurgentes y C. del Río. Entra a la taquilla y recoge el paquete con tu nombre. Cuando salgas, camina dos cuadras más a la derecha por Av. Insurgentes. Llegas a C. Oriente. Baja una cuadra por C. Oriente hacia Av. Universidad. El mercado está en esa esquina — entra y compra algo para comer en el avión. Cuando termines, camina una cuadra a la derecha por Av. Universidad. El aeropuerto está al final, con las puertas de cristal y los aviones que se ven al fondo. Muévete rápido, el vuelo sale pronto.'
+}
+];
+
+const DIFF_LABELS = {1:'⭐ Fácil',2:'⭐⭐ Básico',3:'⭐⭐⭐ Intermedio',4:'⭐⭐⭐⭐ Avanzado',5:'🔥 Experto'};
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+function loadSt(){try{return JSON.parse(localStorage.getItem('ymf_v4')||'null')}catch(e){return null}}
+function saveSt(){try{localStorage.setItem('ymf_v4',JSON.stringify({xp,streak,cIdx,gIdx}))}catch(e){}}
+const sv = loadSt()||{};
+let xp=sv.xp||0, streak=sv.streak||0, cIdx=sv.cIdx||0, gIdx=sv.gIdx||0;
+let mode='follow', isDrag=false, isPlay=false;
+let avatarNode={c:0,r:0};  // current grid position
+let trailPts=[];
+let wpDone=[];
+
+/* ═══════════════════════════════════════════════════
+   DOM
+═══════════════════════════════════════════════════ */
+const $=id=>document.getElementById(id);
+const avatarEl=$('avatarEl');
+const mapSvg=$('mapSvg');
+const mapWrap=$('mapWrap');
+
+/* ═══════════════════════════════════════════════════
+   SVG MAP DRAWING
+═══════════════════════════════════════════════════ */
+function svgEl(tag,attrs,text){
+  const el=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  for(const [k,v] of Object.entries(attrs)) el.setAttribute(k,v);
+  if(text!=null) el.textContent=text;
+  return el;
+}
+
+function buildSvgMap(){
+  mapSvg.setAttribute('width',MAP_W);
+  mapSvg.setAttribute('height',MAP_H);
+  mapSvg.setAttribute('viewBox',`0 0 ${MAP_W} ${MAP_H}`);
+  mapSvg.innerHTML='';
+
+  // Background
+  const bg=svgEl('rect',{x:0,y:0,width:MAP_W,height:MAP_H,fill:'#0b0120'});
+  mapSvg.appendChild(bg);
+
+  // Grid dots (faint)
+  for(let r=0;r<=ROWS_N;r++) for(let c=0;c<=COLS_N;c++){
+    const d=svgEl('circle',{cx:gx(c),cy:gy(r),r:2,fill:'rgba(255,255,255,0.07)'});
+    mapSvg.appendChild(d);
+  }
+
+  // Draw roads (horizontal)
+  H_STREETS.forEach(({r,name})=>{
+    const y=gy(r);
+    // road body
+    const road=svgEl('rect',{x:0,y:y-14,width:MAP_W,height:28,fill:'rgba(148,192,255,0.28)',rx:4});
+    mapSvg.appendChild(road);
+    // center line dashes
+    const dash=svgEl('line',{x1:0,y1:y,x2:MAP_W,y2:y,stroke:'rgba(255,255,200,0.18)','stroke-width':1.5,'stroke-dasharray':'10 10'});
+    mapSvg.appendChild(dash);
+    // label left
+    const lbl=svgEl('text',{x:8,y:y-16,fill:'#9ab0d0','font-size':10,'font-weight':'700','font-family':'DM Sans,sans-serif'});
+    lbl.textContent=name;
+    mapSvg.appendChild(lbl);
+    const lbl2=svgEl('text',{x:MAP_W/2+10,y:y-16,fill:'#9ab0d0','font-size':10,'font-weight':'700','font-family':'DM Sans,sans-serif'});
+    lbl2.textContent=name;
+    mapSvg.appendChild(lbl2);
+  });
+
+  // Draw roads (vertical)
+  V_STREETS.forEach(({c,name})=>{
+    const x=gx(c);
+    const road=svgEl('rect',{x:x-14,y:0,width:28,height:MAP_H,fill:'rgba(148,192,255,0.28)',rx:4});
+    mapSvg.appendChild(road);
+    const dash=svgEl('line',{x1:x,y1:0,x2:x,y2:MAP_H,stroke:'rgba(255,255,200,0.18)','stroke-width':1.5,'stroke-dasharray':'10 10'});
+    mapSvg.appendChild(dash);
+    // rotated label
+    const g=svgEl('g',{transform:`translate(${x+16},${MAP_H/2}) rotate(-90)`});
+    const lbl=svgEl('text',{x:0,y:0,fill:'#9ab0d0','font-size':10,'font-weight':'700','font-family':'DM Sans,sans-serif','text-anchor':'middle'});
+    lbl.textContent=name;
+    g.appendChild(lbl);
+    mapSvg.appendChild(g);
+  });
+
+  // Intersection squares (clean up crossings)
+  for(let r=0;r<=ROWS_N;r++) for(let c=0;c<=COLS_N;c++){
+    const sq=svgEl('rect',{x:gx(c)-14,y:gy(r)-14,width:28,height:28,fill:'rgba(148,192,255,0.28)'});
+    mapSvg.appendChild(sq);
+    // small dot
+    const dot=svgEl('circle',{cx:gx(c),cy:gy(r),r:4,fill:'rgba(255,255,255,0.18)'});
+    mapSvg.appendChild(dot);
+  }
+
+  // SPECIAL ELEMENTS
+  SPECIALS.forEach(sp=>{
+    if(sp.type==='roundabout'){
+      drawRoundabout(sp);
+    } else if(sp.type==='bridge'){
+      drawBridge(sp);
+    } else if(sp.type==='tunnel'){
+      drawTunnel(sp);
+    } else if(sp.type==='park'){
+      drawPark(sp);
+    } else if(sp.type==='plaza'){
+      drawPlaza(sp);
+    }
+  });
+
+  // PLACES
+  PLACES.forEach(p=>drawPlace(p));
+
+  // Trail layer (drawn on top later)
+  const trailG=svgEl('g',{id:'svgTrail'});
+  mapSvg.appendChild(trailG);
+}
+
+function drawRoundabout({c,r,label}){
+  const x=gx(c), y=gy(r);
+  // outer ring
+  const outer=svgEl('circle',{cx:x,cy:y,r:38,fill:'rgba(37,217,255,0.08)',stroke:'rgba(37,217,255,0.35)','stroke-width':2.5});
+  mapSvg.appendChild(outer);
+  // inner island
+  const inner=svgEl('circle',{cx:x,cy:y,r:18,fill:'rgba(34,197,94,0.25)',stroke:'rgba(34,197,94,0.5)','stroke-width':1.5});
+  mapSvg.appendChild(inner);
+  // arrows suggesting circulation
+  for(let i=0;i<4;i++){
+    const angle=(i*90-45)*Math.PI/180;
+    const ax=x+28*Math.cos(angle), ay=y+28*Math.sin(angle);
+    const arr=svgEl('text',{x:ax,y:ay,fill:'rgba(37,217,255,0.7)','font-size':10,'text-anchor':'middle','dominant-baseline':'middle'});
+    arr.textContent='↻';
+    mapSvg.appendChild(arr);
+  }
+  // label
+  const lbl=svgEl('text',{x:x,y:y+54,fill:'#a0d8ef','font-size':9,'font-weight':'800','text-anchor':'middle','font-family':'DM Sans,sans-serif'});
+  lbl.textContent=label;
+  mapSvg.appendChild(lbl);
+}
+
+function drawBridge({c1,c2,r,label}){
+  const x1=gx(c1)+14, x2=gx(c2)-14, y=gy(r);
+  // water / river under bridge
+  const water=svgEl('rect',{x:x1-4,y:y-22,width:(x2-x1)+8,height:44,fill:'rgba(0,120,220,0.28)',rx:3});
+  mapSvg.appendChild(water);
+  // bridge deck
+  const deck=svgEl('rect',{x:x1,y:y-12,width:x2-x1,height:24,fill:'rgba(180,160,100,0.55)',rx:3,stroke:'rgba(200,180,120,0.7)','stroke-width':1.5});
+  mapSvg.appendChild(deck);
+  // railings
+  const r1=svgEl('line',{x1:x1,y1:y-10,x2:x2,y2:y-10,stroke:'rgba(200,180,120,0.8)','stroke-width':2});
+  const r2=svgEl('line',{x1:x1,y1:y+10,x2:x2,y2:y+10,stroke:'rgba(200,180,120,0.8)','stroke-width':2});
+  mapSvg.appendChild(r1);mapSvg.appendChild(r2);
+  // label
+  const mx=(x1+x2)/2;
+  const lbl=svgEl('text',{x:mx,y:y-26,fill:'#c8b870','font-size':9,'font-weight':'800','text-anchor':'middle','font-family':'DM Sans,sans-serif'});
+  lbl.textContent='🌉 '+label;
+  mapSvg.appendChild(lbl);
+}
+
+function drawTunnel({c,r1,r2,label}){
+  const x=gx(c), y1=gy(r1)+14, y2=gy(r2)-14;
+  // tunnel body
+  const tun=svgEl('rect',{x:x-16,y:y1,width:32,height:y2-y1,fill:'rgba(40,20,80,0.85)',rx:4,stroke:'rgba(120,80,200,0.5)','stroke-width':1.5});
+  mapSvg.appendChild(tun);
+  // entry/exit arches
+  [y1-4,y2+4].forEach(ty=>{
+    const arch=svgEl('ellipse',{cx:x,cy:ty,rx:16,ry:8,fill:'rgba(30,10,60,0.9)',stroke:'rgba(120,80,200,0.6)','stroke-width':2});
+    mapSvg.appendChild(arch);
+  });
+  // lights inside
+  for(let i=1;i<=3;i++){
+    const ly=y1+i*(y2-y1)/4;
+    const lt=svgEl('circle',{cx:x,cy:ly,r:3,fill:'rgba(255,230,100,0.5)'});
+    mapSvg.appendChild(lt);
+  }
+  const lbl=svgEl('text',{x:x+20,y:(y1+y2)/2,fill:'#b090e0','font-size':9,'font-weight':'800','font-family':'DM Sans,sans-serif','dominant-baseline':'middle'});
+  lbl.textContent='🚇 '+label;
+  mapSvg.appendChild(lbl);
+}
+
+function drawPark({c,r,label}){
+  const px=gx(c)-CS/2+20, py=gy(r)-CS/2+20;
+  const pw=CS-40, ph=CS-40;
+  const rect=svgEl('rect',{x:px,y:py,width:pw,height:ph,fill:'rgba(34,197,94,0.18)',rx:10,stroke:'rgba(34,197,94,0.35)','stroke-width':1.5});
+  mapSvg.appendChild(rect);
+  // tree dots
+  [[0.3,0.3],[0.7,0.3],[0.5,0.6],[0.2,0.7],[0.8,0.65]].forEach(([tx,ty])=>{
+    const tree=svgEl('circle',{cx:px+pw*tx,cy:py+ph*ty,r:8,fill:'rgba(34,197,94,0.45)'});
+    mapSvg.appendChild(tree);
+  });
+  const lbl=svgEl('text',{x:px+pw/2,y:py+ph/2+22,fill:'#4ade80','font-size':9,'font-weight':'800','text-anchor':'middle','font-family':'DM Sans,sans-serif'});
+  lbl.textContent='🌳 '+label;
+  mapSvg.appendChild(lbl);
+}
+
+function drawPlaza({c,r,label}){
+  const px=gx(c)+18, py=gy(r)+18;
+  const pw=CS-36, ph=CS-36;
+  const rect=svgEl('rect',{x:px,y:py,width:pw,height:ph,fill:'rgba(245,158,11,0.12)',rx:8,stroke:'rgba(245,158,11,0.30)','stroke-width':1.5});
+  mapSvg.appendChild(rect);
+  const flag=svgEl('text',{x:px+pw/2,y:py+ph/2,fill:'rgba(245,158,11,0.7)','font-size':22,'text-anchor':'middle','dominant-baseline':'middle'});
+  flag.textContent='🏛️';
+  mapSvg.appendChild(flag);
+  const lbl=svgEl('text',{x:px+pw/2,y:py+ph+14,fill:'#fcd34d','font-size':9,'font-weight':'800','text-anchor':'middle','font-family':'DM Sans,sans-serif'});
+  lbl.textContent=label;
+  mapSvg.appendChild(lbl);
+}
+
+function drawPlace(p){
+  const x=gx(p.c)+(p.offX||0);
+  const y=gy(p.r)+(p.offY||0);
+  const w=82, h=50;
+  const g=svgEl('g',{class:'place-g','data-place':p.key,style:'cursor:default'});
+
+  const shadow=svgEl('rect',{x:x+2,y:y+2,width:w,height:h,rx:9,fill:'rgba(0,0,0,0.3)'});
+  g.appendChild(shadow);
+
+  const rect=svgEl('rect',{x:x,y:y,width:w,height:h,rx:9,
+    fill:'rgba(235,232,255,0.94)',stroke:'rgba(37,217,255,0.5)','stroke-width':1.8});
+  g.appendChild(rect);
+
+  const ico=svgEl('text',{x:x+w/2,y:y+20,'font-size':16,'text-anchor':'middle','dominant-baseline':'middle'});
+  ico.textContent=p.icon;
+  g.appendChild(ico);
+
+  const nm=svgEl('text',{x:x+w/2,y:y+38,'font-size':9,'font-weight':'800','text-anchor':'middle','fill':'#111827','font-family':'DM Sans,sans-serif'});
+  nm.textContent=p.name;
+  g.appendChild(nm);
+
+  g.setAttribute('data-key',p.key);
+  mapSvg.appendChild(g);
+}
+
+/* ═══════════════════════════════════════════════════
+   HIGHLIGHT PLACES
+═══════════════════════════════════════════════════ */
+function highlightPlaces(ch, wpDone){
+  // reset all
+  mapSvg.querySelectorAll('.place-g rect:nth-child(2)').forEach(r=>{
+    r.setAttribute('fill','rgba(235,232,255,0.94)');
+    r.setAttribute('stroke','rgba(37,217,255,0.5)');
+    r.setAttribute('stroke-width','1.8');
+  });
+  mapSvg.querySelectorAll('.wp-num-badge').forEach(e=>e.remove());
+
+  function stylePlace(key, fill, stroke, sw){
+    const g=mapSvg.querySelector(`.place-g[data-key="${key}"]`);
+    if(!g)return;
+    const r=g.querySelectorAll('rect')[1];
+    if(r){r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);r.setAttribute('stroke-width',sw||'2');}
+  }
+
+  stylePlace(ch.placeStart,'#ede9fe','#a78bfa','2.5');
+  stylePlace(ch.placeTarget,'#fff0fb','#ff2bbf','2.5');
+
+  (ch.placeWaypoints||[]).forEach((wp,i)=>{
+    if(!wp||wp.startsWith('glorieta')||wp.startsWith('puente')||wp.startsWith('tunel')) return;
+    const col=wpDone[i]?'rgba(34,197,94,0.8)':'rgba(245,158,11,0.7)';
+    stylePlace(wp, wpDone[i]?'#f0fdf4':'#fffbeb', col,'2.5');
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   TRAIL
+═══════════════════════════════════════════════════ */
+function renderTrail(){
+  const g=mapSvg.querySelector('#svgTrail');
+  if(!g)return;
+  g.innerHTML='';
+  if(!trailPts.length)return;
+  const all=[...trailPts,avatarNode];
+  let d=`M${gx(all[0].c)},${gy(all[0].r)}`;
+  for(let i=1;i<all.length;i++) d+=` L${gx(all[i].c)},${gy(all[i].r)}`;
+  const path=svgEl('path',{d,stroke:'rgba(37,217,255,0.5)','stroke-width':4,'stroke-dasharray':'8 6',fill:'none','stroke-linecap':'round'});
+  g.appendChild(path);
+  // start dot
+  const sd=svgEl('circle',{cx:gx(all[0].c),cy:gy(all[0].r),r:6,fill:'rgba(167,139,250,0.7)'});
+  g.appendChild(sd);
+}
+function clearTrail(){trailPts=[];const g=mapSvg.querySelector('#svgTrail');if(g)g.innerHTML='';}
+
+/* ═══════════════════════════════════════════════════
+   AVATAR POSITIONING
+═══════════════════════════════════════════════════ */
+const AV=22; // avatar radius
+function positionAvatar(c,r,addTrail=false){
+  if(addTrail&&(avatarNode.c!==c||avatarNode.r!==r)){
+    trailPts.push({c:avatarNode.c,r:avatarNode.r});
+    renderTrail();
+  }
+  avatarNode={c,r};
+  const svgRect=mapSvg.getBoundingClientRect();
+  const wrapRect=$('mapWrap').getBoundingClientRect();
+  // position relative to the mapSvg's parent div
+  avatarEl.style.left=(gx(c)-AV)+'px';
+  avatarEl.style.top=(gy(r)-AV)+'px';
+  avatarEl.style.width=avatarEl.style.height=(AV*2)+'px';
+  avatarEl.style.fontSize='1.4rem';
+}
+
+function nearestGridNode(x,y){
+  let best={c:0,r:0,d:1e9};
+  for(let r=0;r<=ROWS_N;r++) for(let c=0;c<=COLS_N;c++){
+    const d=(x-gx(c))**2+(y-gy(r))**2;
+    if(d<best.d)best={c,r,d};
+  }
+  return best;
+}
+
+/* ═══════════════════════════════════════════════════
+   WAYPOINT CHECK
+═══════════════════════════════════════════════════ */
+function checkWaypoints(ch){
+  // For follow challenges, waypoints are node keys like 'n31'
+  // We check if avatarNode matches that node
+  let hit=false;
+  ch.waypoints.forEach((wpKey,i)=>{
+    if(wpDone[i])return;
+    const prevOk=i===0||wpDone[i-1];
+    if(!prevOk)return;
+    // parse node key
+    const nd=NODES[wpKey];
+    if(nd&&avatarNode.c===nd.c&&avatarNode.r===nd.r){
+      wpDone[i]=true; hit=true;
+    }
+  });
+  if(hit){
+    highlightPlaces(ch,wpDone);
+    buildWpSidebar(ch,wpDone);
+    avatarEl.classList.remove('wphit');void avatarEl.offsetWidth;avatarEl.classList.add('wphit');
+    const nextIdx=wpDone.indexOf(false);
+    const nextLabel=nextIdx>=0?(ch.placeWaypoints||[])[nextIdx]:'el destino';
+    showFb('fb1','neu',`✅ <b>¡Parada visitada!</b> Ahora ve a: <b>${nextLabel||'el destino final'}</b>`);
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   WAYPOINT SIDEBAR
+═══════════════════════════════════════════════════ */
+function buildWpSidebar(ch,done){
+  const list=$('wpList');
+  list.innerHTML='';
+  const all=[
+    {label:(ch.placeStart||ch.start)+' (inicio)', icon:'🟣', state:'done'},
+    ...(ch.waypoints||[]).map((wp,i)=>{
+      const lbl=(ch.placeWaypoints&&ch.placeWaypoints[i])||wp;
+      return {label:lbl, icon:'🟡', state:done[i]?'done':done.slice(0,i).every(Boolean)?'active':'pending'};
+    }),
+    {label:(ch.placeTarget||ch.target)+' (destino)', icon:'🔴', state:'final'}
+  ];
+  all.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='wp-item'+(item.state==='done'?' done':item.state==='active'?' active':item.state==='final'?' final':'');
+    const dot=document.createElement('div');
+    dot.className='wp-dot '+(item.state==='done'?'dot-done':item.state==='active'?'dot-active':item.state==='final'?'dot-final':'dot-pend');
+    const span=document.createElement('span');
+    span.textContent=item.label;
+    div.appendChild(dot);div.appendChild(span);
+    list.appendChild(div);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   LEVEL PIPS
+═══════════════════════════════════════════════════ */
+function buildPips(lvl){
+  const bar=$('lpips');bar.innerHTML='';
+  [1,2,3,4,5].forEach(l=>{
+    const pip=document.createElement('div');
+    pip.className='pip '+(l<lvl?'done':l===lvl?'cur':'lock');
+    bar.appendChild(pip);
+  });
+  const lbl=document.createElement('span');
+  lbl.className='pip-lbl';lbl.textContent=`Nivel ${lvl}/5`;
+  bar.appendChild(lbl);
+}
+
+/* ═══════════════════════════════════════════════════
+   STATS
+═══════════════════════════════════════════════════ */
+function updateStats(lvl){
+  $('sXP').textContent=xp;
+  $('sStreak').textContent=streak;
+  $('sLevel').textContent=lvl||1;
+  $('sCounter').textContent=(mode==='follow'?cIdx%CHALLENGES.length:gIdx%GIVE_CHALLENGES.length)+1;
+  $('xbi').style.width=Math.min(100,xp%100)+'%';
+  $('sSt').classList.toggle('fire',streak>=3);
+  saveSt();
+}
+function addXP(pts){xp+=pts;streak++;$('xpStat')&&$('xpStat').animate&&$('xpStat').animate([{filter:'brightness(1.5)'},{filter:'brightness(1)'}],{duration:400});}
+function resetStreak(){streak=0;}
+
+/* ═══════════════════════════════════════════════════
+   FEEDBACK
+═══════════════════════════════════════════════════ */
+function showFb(id,cls,html){const el=$(id);el.className='fb show '+cls;el.innerHTML=html;}
+
+/* ═══════════════════════════════════════════════════
+   CONFETTI
+═══════════════════════════════════════════════════ */
+function confetti(){
+  const w=$('confWrap');w.innerHTML='';
+  const cols=['#25d9ff','#ff2bbf','#22c55e','#f59e0b','#a78bfa','#fb7185'];
+  for(let i=0;i<48;i++){
+    const el=document.createElement('div');
+    el.className='cf';
+    el.style.cssText=`left:${5+Math.random()*90}%;top:${Math.random()*10}%;background:${cols[i%6]};animation-delay:${Math.random()*.8}s;animation-duration:${1+Math.random()*.8}s`;
+    w.appendChild(el);
+  }
+  setTimeout(()=>w.innerHTML='',3000);
+}
+
+/* ═══════════════════════════════════════════════════
+   AUDIO
+═══════════════════════════════════════════════════ */
+function stopSpeech(){if('speechSynthesis' in window)window.speechSynthesis.cancel();isPlay=false;$('audioBtn').classList.remove('pl');$('audioTxt').textContent='Escuchar';}
+function speak(html){
+  if(!('speechSynthesis' in window)){alert('Tu navegador no soporta voz.');return;}
+  if(isPlay){stopSpeech();return;}
+  stopSpeech();
+  const plain=html.replace(/<[^>]+>/g,'');
+  const u=new SpeechSynthesisUtterance(plain);
+  u.lang='es-MX';u.rate=0.85;
+  u.onstart=()=>{isPlay=true;$('audioBtn').classList.add('pl');$('audioTxt').textContent='Pausar';};
+  u.onend=u.onerror=stopSpeech;
+  window.speechSynthesis.speak(u);
+}
+
+/* ═══════════════════════════════════════════════════
+   LOAD FOLLOW
+═══════════════════════════════════════════════════ */
+function loadFollow(){
+  mode='follow';stopSpeech();
+  $('followBox').style.display='block';
+  $('mode1ctrl').style.display='block';
+  $('mode2ctrl').style.display='none';
+  $('followBtn').className='tab on';$('followBtn').setAttribute('aria-selected','true');
+  $('giveBtn').className='tab off';$('giveBtn').setAttribute('aria-selected','false');
+
+  const ch=CHALLENGES[cIdx%CHALLENGES.length];
+  wpDone=ch.waypoints.map(()=>false);
+
+  $('instrText').innerHTML=ch.text;
+  $('diffBadge').textContent=DIFF_LABELS[ch.diff];
+  $('diffBadge').className='diff d'+ch.diff;
+  $('fb1').className='fb';
+  clearTrail();
+
+  const sn=NODES[ch.start];
+  positionAvatar(sn.c,sn.r);
+  highlightPlaces(ch,wpDone);
+  buildWpSidebar(ch,wpDone);
+  buildPips(ch.level);
+  updateStats(ch.level);
+}
+
+/* ═══════════════════════════════════════════════════
+   CHECK FOLLOW
+═══════════════════════════════════════════════════ */
+function checkFollow(){
+  const ch=CHALLENGES[cIdx%CHALLENGES.length];
+  const tn=NODES[ch.target];
+  const atTarget=avatarNode.c===tn.c&&avatarNode.r===tn.r;
+  const allWp=wpDone.every(Boolean)||ch.waypoints.length===0;
+
+  if(atTarget&&allWp){
+    addXP(ch.xp);
+    const pl=PLACES.find(p=>p.key===ch.placeTarget);
+    confetti();
+    avatarEl.classList.remove('arrived');void avatarEl.offsetWidth;avatarEl.classList.add('arrived');
+    highlightPlaces(ch,wpDone);
+    showFb('fb1','good',`🎉 <b>¡Misión completada!</b> Llegaste ${pl?'a <b>'+pl.icon+' '+pl.name+'</b>':''} con todas las paradas. <b>+${ch.xp} XP</b>`);
+  }else if(atTarget&&!allWp){
+    resetStreak();
+    const missing=ch.waypoints.filter((_,i)=>!wpDone[i]);
+    const mNames=missing.map(k=>{
+      const nd=NODES[k];
+      if(!nd)return k;
+      const pl=(ch.placeWaypoints||[])[ch.waypoints.indexOf(k)];
+      return pl||k;
+    });
+    showFb('fb1','bad',`<b>Llegaste al destino</b>, pero te faltaron paradas: <b>${mNames.join(', ')}</b>. Reinicia y visítalas en orden.`);
+  }else{
+    resetStreak();
+    const pl=PLACES.find(p=>p.key===ch.placeTarget);
+    showFb('fb1','bad',`<b>Todavía no.</b> El destino final es <b>${pl?pl.icon+' '+pl.name:ch.target}</b>. Revisa también las paradas intermedias.`);
+  }
+  updateStats(ch.level);
+}
+
+/* ═══════════════════════════════════════════════════
+   MOVE AVATAR
+═══════════════════════════════════════════════════ */
+function moveAvatar(dir){
+  if(mode!=='follow')return;
+  let {c,r}=avatarNode;
+  if(dir==='up'&&r>0)r--;
+  if(dir==='down'&&r<ROWS_N)r++;
+  if(dir==='left'&&c>0)c--;
+  if(dir==='right'&&c<COLS_N)c++;
+  positionAvatar(c,r,true);
+  checkWaypoints(CHALLENGES[cIdx%CHALLENGES.length]);
+}
+
+/* ═══════════════════════════════════════════════════
+   DRAG
+═══════════════════════════════════════════════════ */
+avatarEl.addEventListener('pointerdown',e=>{
+  if(mode!=='follow')return;
+  isDrag=true;avatarEl.classList.add('drag');avatarEl.setPointerCapture(e.pointerId);
+});
+avatarEl.addEventListener('pointermove',e=>{
+  if(!isDrag)return;
+  const svgRect=mapSvg.getBoundingClientRect();
+  const x=e.clientX-svgRect.left, y=e.clientY-svgRect.top;
+  avatarEl.style.transition='none';
+  avatarEl.style.left=(x-AV)+'px';
+  avatarEl.style.top=(y-AV)+'px';
+});
+function endDrag(e){
+  if(!isDrag)return;isDrag=false;avatarEl.classList.remove('drag');avatarEl.style.transition='';
+  const svgRect=mapSvg.getBoundingClientRect();
+  const x=e.clientX-svgRect.left, y=e.clientY-svgRect.top;
+  const nd=nearestGridNode(x,y);
+  positionAvatar(nd.c,nd.r,true);
+  checkWaypoints(CHALLENGES[cIdx%CHALLENGES.length]);
+}
+avatarEl.addEventListener('pointerup',endDrag);
+avatarEl.addEventListener('pointercancel',endDrag);
+
+document.addEventListener('keydown',e=>{
+  if(mode!=='follow')return;
+  const m={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+  if(m[e.key]){e.preventDefault();moveAvatar(m[e.key]);}
+});
+
+/* ═══════════════════════════════════════════════════
+   LOAD GIVE
+═══════════════════════════════════════════════════ */
+function loadGive(){
+  mode='give';stopSpeech();
+  $('followBox').style.display='none';
+  $('mode1ctrl').style.display='none';
+  $('mode2ctrl').style.display='block';
+  $('followBtn').className='tab off';$('followBtn').setAttribute('aria-selected','false');
+  $('giveBtn').className='tab on';$('giveBtn').setAttribute('aria-selected','true');
+
+  const gc=GIVE_CHALLENGES[gIdx%GIVE_CHALLENGES.length];
+  $('givePrompt').textContent=gc.prompt;
+  $('giveDiff').textContent=DIFF_LABELS[gc.diff];
+  $('giveDiff').className='diff d'+gc.diff;
+  $('answer').value='';
+  $('fb2').className='fb';
+  $('modelBox').style.display='none';
+  clearTrail();
+
+  // show from/to on map
+  const fakeWpDone=gc.waypoints.map(()=>false);
+  const fakeCh={placeStart:gc.from,placeTarget:gc.to,placeWaypoints:gc.waypoints,waypoints:gc.waypoints.map(()=>'')};
+  // just highlight from/to
+  mapSvg.querySelectorAll('.place-g rect:nth-child(2)').forEach(r=>{
+    r.setAttribute('fill','rgba(235,232,255,0.94)');r.setAttribute('stroke','rgba(37,217,255,0.5)');r.setAttribute('stroke-width','1.8');
+  });
+  const styleP=(key,fill,stroke)=>{
+    const g=mapSvg.querySelector(`.place-g[data-key="${key}"]`);
+    if(!g)return;const r=g.querySelectorAll('rect')[1];
+    if(r){r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);r.setAttribute('stroke-width','2.5');}
+  };
+  styleP(gc.from,'#ede9fe','#a78bfa');
+  styleP(gc.to,'#fff0fb','#ff2bbf');
+  gc.waypoints.forEach(wp=>{if(wp&&!wp.startsWith('glorieta')&&!wp.startsWith('puente')&&!wp.startsWith('tunel'))styleP(wp,'#fffbeb','rgba(245,158,11,0.7)');});
+
+  const sn=NODES[gc.fromNode]||{c:0,r:0};
+  positionAvatar(sn.c,sn.r);
+  buildPips(gc.level);
+  updateStats(gc.level);
+}
+
+/* ═══════════════════════════════════════════════════
+   CHECK GIVE — AI
+═══════════════════════════════════════════════════ */
+async function checkGive(){
+  const gc=GIVE_CHALLENGES[gIdx%GIVE_CHALLENGES.length];
+  const txt=$('answer').value.trim();
+  if(!txt){showFb('fb2','neu','Escribe una respuesta primero.');return;}
+  showFb('fb2','load','✦ La IA está evaluando tu ruta…');
+  $('checkGiveBtn').disabled=true;
+
+  const hNames=H_STREETS.map(s=>s.name).join(', ');
+  const vNames=V_STREETS.map(s=>s.name).join(', ');
+  const specs=SPECIALS.map(s=>s.label).join(', ');
+  const wpStr=gc.waypoints.length?`Paradas intermedias requeridas: ${gc.waypoints.join(', ')}.`:'Sin paradas intermedias.';
+
+  const prompt=`Eres un profesor de español A2. Evalúa si el texto de un estudiante da una ruta válida y clara en una ciudad.
+
+CALLES HORIZONTALES: ${hNames}.
+CALLES VERTICALES: ${vNames}.
+ELEMENTOS ESPECIALES: ${specs}.
+RUTA PEDIDA: de "${gc.from}" a "${gc.to}". ${wpStr}
+
+TEXTO DEL ESTUDIANTE:
+"""
+${txt}
+"""
+
+Responde en español A2 (sencillo, máximo 5 oraciones). Indica:
+1. Si llega al destino correcto.
+2. Si menciona las paradas (${gc.waypoints.join(', ') || 'ninguna requerida'}).
+3. Si usa vocabulario de direcciones: caminar, girar, cruzar, dar vuelta, rotonda, puente, etc.
+4. Qué puede mejorar.
+Termina con "✅ Excelente" o "💡 Casi, mejora un poco".`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const reply=(data.content||[]).map(b=>b.text||'').join('').trim();
+    if(!reply)throw new Error('empty');
+    const good=reply.includes('✅');
+    if(good){addXP(gc.xp);confetti();}else resetStreak();
+    updateStats(gc.level);
+    showFb('fb2',good?'good':'neu',reply.replace(/\n/g,'<br>'));
+  }catch(e){
+    showFb('fb2','neu','No se pudo conectar con la IA. Verifica tu conexión.');
+  }finally{$('checkGiveBtn').disabled=false;}
+}
+
+/* ═══════════════════════════════════════════════════
+   WIRING
+═══════════════════════════════════════════════════ */
+$('followBtn').onclick=loadFollow;
+$('giveBtn').onclick=loadGive;
+$('up').onclick=()=>moveAvatar('up');
+$('down').onclick=()=>moveAvatar('down');
+$('left').onclick=()=>moveAvatar('left');
+$('right').onclick=()=>moveAvatar('right');
+$('checkBtn').onclick=checkFollow;
+$('nextBtn').onclick=()=>{cIdx=(cIdx+1)%CHALLENGES.length;loadFollow();};
+$('resetBtn').onclick=loadFollow;
+$('hintBtn').onclick=()=>showFb('fb1','neu','💡 <b>Pista:</b> '+CHALLENGES[cIdx%CHALLENGES.length].hint);
+$('audioBtn').onclick=()=>speak($('instrText').innerHTML);
+$('checkGiveBtn').onclick=checkGive;
+$('nextGiveBtn').onclick=()=>{gIdx=(gIdx+1)%GIVE_CHALLENGES.length;loadGive();};
+$('clearBtn').onclick=()=>{$('answer').value='';$('fb2').className='fb';$('modelBox').style.display='none';};
+$('modelBtn').onclick=()=>{const gc=GIVE_CHALLENGES[gIdx%GIVE_CHALLENGES.length];$('modelBox').style.display='block';$('modelBox').innerHTML='<b>Modelo:</b><br><br>'+gc.model;};
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+buildSvgMap();
+loadFollow();
+</script>
+</body>
+</html>
