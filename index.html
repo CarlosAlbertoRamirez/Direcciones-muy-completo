@@ -19,7 +19,7 @@
 body{font-family:var(--font);background:radial-gradient(ellipse at 12% 12%,rgba(255,43,191,.13),transparent 28%),radial-gradient(ellipse at 88% 18%,rgba(37,217,255,.09),transparent 28%),linear-gradient(155deg,var(--bg1),var(--bg2));color:var(--text);min-height:100vh}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
-.app{width:min(1500px,98%);margin:14px auto 28px;display:flex;flex-direction:column;gap:12px}
+.app{width:min(1600px,99%);margin:14px auto 28px;display:flex;flex-direction:column;gap:12px}
 
 /* HERO */
 .hero{border-radius:22px;padding:20px 26px;background:linear-gradient(130deg,#0a0022,#1c0048 55%,#0c002e);border:1px solid rgba(255,255,255,.09);position:relative;overflow:hidden}
@@ -32,10 +32,11 @@ body{font-family:var(--font);background:radial-gradient(ellipse at 12% 12%,rgba(
 .badge{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.11);border-radius:999px;padding:3px 9px;font-size:.7rem;font-weight:700;color:var(--muted)}
 .badge.c{border-color:rgba(37,217,255,.28);color:var(--cyan)}
 
-/* FULL-WIDTH MAP FIRST */
-.map-section{background:linear-gradient(180deg,rgba(16,3,36,.97),rgba(22,8,48,.97));border:1px solid rgba(37,217,255,.12);border-radius:20px;padding:14px;box-shadow:var(--shadow)}
+/* MAIN ROW: map left, side panel right */
+.main-row{display:grid;grid-template-columns:1fr 380px;gap:12px;align-items:start}
+.map-section{background:linear-gradient(180deg,rgba(16,3,36,.97),rgba(22,8,48,.97));border:1px solid rgba(37,217,255,.12);border-radius:20px;padding:14px;box-shadow:var(--shadow);min-width:0}
+.side-panel{background:linear-gradient(180deg,rgba(16,3,36,.97),rgba(22,8,48,.97));border:1px solid rgba(37,217,255,.12);border-radius:20px;padding:14px;box-shadow:var(--shadow);position:sticky;top:12px;max-height:calc(100vh - 24px);overflow-y:auto}
 .map-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
-.map-top h2{font-family:var(--display);font-size:1.15rem;font-weight:800}
 .tabs{display:flex;gap:6px}
 .tab{border:0;border-radius:9px;padding:8px 14px;font-weight:800;font-family:var(--font);font-size:.82rem;cursor:pointer;transition:.18s}
 .tab.on{background:linear-gradient(135deg,var(--magenta),var(--magenta2));color:white;transform:translateY(-2px);box-shadow:0 3px 0 rgba(0,0,0,.2)}
@@ -48,12 +49,12 @@ body{font-family:var(--font);background:radial-gradient(ellipse at 12% 12%,rgba(
 .stat span{color:var(--muted);font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
 .stat strong{font-size:1.1rem;font-weight:800;color:var(--cyan);font-family:var(--display)}
 .stat.fire strong{color:var(--warn)}
-.xpw{flex:1;min-width:160px}
+.xpw{flex:1;min-width:120px}
 .xpw .xb{height:5px;background:rgba(255,255,255,.08);border-radius:999px;margin-top:3px;overflow:hidden}
 .xpw .xbi{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--cyan),var(--magenta));transition:width .5s}
 
 /* LEVEL PIPS */
-.lpips{display:flex;gap:5px;align-items:center;margin-bottom:10px}
+.lpips{display:flex;gap:5px;align-items:center;margin-bottom:8px}
 .pip{height:7px;border-radius:999px;transition:.4s;flex:1;max-width:60px}
 .pip.done{background:var(--good)}
 .pip.cur{background:var(--cyan);box-shadow:0 0 7px rgba(37,217,255,.5)}
@@ -61,12 +62,11 @@ body{font-family:var(--font);background:radial-gradient(ellipse at 12% 12%,rgba(
 .pip-lbl{font-family:var(--display);font-size:.75rem;font-weight:800;color:var(--muted);margin-left:6px;white-space:nowrap}
 
 /* THE BIG MAP */
-.map-wrap{border:2px solid rgba(37,217,255,.15);border-radius:16px;overflow:auto;background:#0b0120;cursor:default;min-height:500px}
-.map-wrap svg{display:block}
+.map-wrap{border:2px solid rgba(37,217,255,.15);border-radius:16px;overflow:auto;background:#0b0120;cursor:default;width:100%}
+.map-wrap>div{display:block;min-width:max-content}
+.map-wrap svg{display:block;max-width:none}
 
-/* BOTTOM GRID: instruction panel left, controls right */
-.bottom{display:grid;grid-template-columns:1fr 340px;gap:12px;margin-top:12px}
-.panel{background:linear-gradient(180deg,rgba(16,3,36,.97),rgba(22,8,48,.97));border:1px solid rgba(37,217,255,.12);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+@media(max-width:1100px){.main-row{grid-template-columns:1fr}.side-panel{position:static;max-height:none}}
 
 /* INSTRUCTION */
 .sec-title{font-family:var(--display);font-size:1.1rem;font-weight:800;margin-bottom:3px}
@@ -173,19 +173,18 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
   </div>
 </header>
 
-<!-- MAP SECTION (full width) -->
+<!-- MAIN ROW: map left, instructions right -->
+<div class="main-row">
+
 <section class="map-section" aria-label="Mapa interactivo de la ciudad">
   <div class="map-top">
     <div>
-      <h2 id="mapTitle" style="font-family:var(--display);font-size:1.15rem;font-weight:800">Ciudad Interactiva</h2>
-      <p style="color:var(--muted);font-size:.76rem;margin-top:1px" id="mapMeta"></p>
+      <h2 id="mapTitle" style="font-family:var(--display);font-size:1.1rem;font-weight:800">Ciudad Interactiva</h2>
+      <p style="color:var(--muted);font-size:.72rem;margin-top:1px" id="mapMeta"></p>
     </div>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-      <div class="lpips" id="lpips"></div>
-      <div class="tabs" role="tablist">
-        <button class="tab on" id="followBtn" role="tab" aria-selected="true">Modo 1: seguir</button>
-        <button class="tab off" id="giveBtn" role="tab" aria-selected="false">Modo 2: explicar</button>
-      </div>
+    <div class="tabs" role="tablist">
+      <button class="tab on" id="followBtn" role="tab" aria-selected="true">Modo 1: seguir</button>
+      <button class="tab off" id="giveBtn" role="tab" aria-selected="false">Modo 2: explicar</button>
     </div>
   </div>
 
@@ -196,7 +195,8 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
     <div class="stat"><span>Reto</span><strong id="sCounter">1</strong></div>
   </div>
 
-  <!-- THE MAP -->
+  <div class="lpips" id="lpips"></div>
+
   <div class="map-wrap" id="mapWrap">
     <div style="position:relative;display:inline-block">
       <svg id="mapSvg" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -206,12 +206,13 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
   </div>
 </section>
 
-<!-- BOTTOM PANELS -->
-<div class="bottom">
-  <!-- LEFT: INSTRUCTIONS -->
-  <div class="panel" id="followBox" role="tabpanel">
+<!-- RIGHT SIDE PANEL -->
+<aside class="side-panel">
+
+  <!-- MODE 1 -->
+  <div id="followBox" role="tabpanel">
     <h2 class="sec-title">Modo 1: sigue la ruta</h2>
-    <p class="sec-sub">Lee las instrucciones como si fueran un GPS. Visita cada parada en orden y llega al destino.</p>
+    <p class="sec-sub">Lee las instrucciones como un GPS. Visita cada parada en orden y llega al destino.</p>
 
     <div class="instr-card" id="instrCard">
       <div class="instr-head">
@@ -223,6 +224,18 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
     </div>
 
     <div class="wp-list" id="wpList" aria-live="polite"></div>
+
+    <div class="instr-card" id="mode1ctrl" style="margin-bottom:10px">
+      <div class="ctitle" style="margin-bottom:6px">Controles</div>
+      <div class="dpad" role="group" aria-label="Dirección">
+        <div></div><button class="dp" id="up" aria-label="Arriba">⬆️</button><div></div>
+        <button class="dp" id="left" aria-label="Izquierda">⬅️</button>
+        <div class="dpc" aria-hidden="true">🧍</div>
+        <button class="dp" id="right" aria-label="Derecha">➡️</button>
+        <div></div><button class="dp" id="down" aria-label="Abajo">⬇️</button><div></div>
+      </div>
+      <p style="color:var(--muted);font-size:.72rem;text-align:center;margin-top:4px">Flechas del teclado o arrastra el monito.</p>
+    </div>
 
     <div class="fb" id="fb1" role="alert"></div>
     <div class="actions">
@@ -242,44 +255,37 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
     </div>
   </div>
 
-  <!-- RIGHT: CONTROLS -->
-  <div class="panel" id="controlBox">
-    <!-- MODE 1 controls -->
-    <div id="mode1ctrl">
-      <div class="ctitle" style="margin-bottom:6px">Controles</div>
-      <div class="dpad" role="group" aria-label="Dirección">
-        <div></div><button class="dp" id="up" aria-label="Arriba">⬆️</button><div></div>
-        <button class="dp" id="left" aria-label="Izquierda">⬅️</button>
-        <div class="dpc" aria-hidden="true">🧍</div>
-        <button class="dp" id="right" aria-label="Derecha">➡️</button>
-        <div></div><button class="dp" id="down" aria-label="Abajo">⬇️</button><div></div>
+  <!-- MODE 2 -->
+  <div id="mode2ctrl" style="display:none" role="tabpanel">
+    <h2 class="sec-title">Modo 2: da direcciones</h2>
+    <p class="sec-sub">Escribe la ruta completa con todas las paradas. La IA evalúa tu respuesta.</p>
+    <div class="instr-card">
+      <div class="instr-head">
+        <span class="ctitle">Situación</span>
+        <span class="diff" id="giveDiff"></span>
       </div>
-      <p style="color:var(--muted);font-size:.74rem;text-align:center;margin-bottom:10px">También: flechas del teclado o arrastra el monito.</p>
+      <div class="instr-text" id="givePrompt" aria-live="polite"></div>
     </div>
-
-    <!-- MODE 2 controls -->
-    <div id="mode2ctrl" style="display:none">
-      <div class="sec-title">Modo 2: da direcciones</div>
-      <p class="sec-sub">Escribe la ruta completa con todas las paradas. La IA evalúa.</p>
-      <div class="instr-card">
-        <div class="instr-head">
-          <span class="ctitle">Situación</span>
-          <span class="diff" id="giveDiff"></span>
-        </div>
-        <div class="instr-text" id="givePrompt" aria-live="polite"></div>
+    <label for="answer" class="sr-only">Escribe tu ruta aquí</label>
+    <textarea id="answer" placeholder="Sal de la estación. Camina dos cuadras a la derecha por Av. Principal. Da vuelta en la rotonda y toma la segunda salida. Cruza el puente. Detente en la farmacia…"></textarea>
+    <div class="fb" id="fb2" role="alert"></div>
+    <div class="actions" style="flex-wrap:wrap">
+      <button class="btn bw" id="modelBtn">Ver modelo</button>
+      <button class="btn bg" id="clearBtn">Limpiar</button>
+      <button class="btn bc" id="checkGiveBtn">Revisar con IA ✦</button>
+      <button class="btn bd" id="nextGiveBtn">Siguiente →</button>
+    </div>
+    <div class="model-box" id="modelBox"></div>
+    <div style="margin-top:10px">
+      <div class="ctitle" style="margin-bottom:6px">Tu texto debe incluir</div>
+      <div class="vocab">
+        <span>Sal de…</span><span>Camina N cuadras</span><span>Gira a la derecha/izquierda</span>
+        <span>Da vuelta en la rotonda</span><span>Cruza el puente</span><span>Detente en…</span>
       </div>
-      <label for="answer" class="sr-only">Escribe tu ruta aquí</label>
-      <textarea id="answer" placeholder="Sal de la estación. Camina dos cuadras a la derecha por Av. Principal. Da vuelta en la rotonda y toma la segunda salida hacia Av. Norte. Cruza el puente. Detente en la farmacia…"></textarea>
-      <div class="fb" id="fb2" role="alert"></div>
-      <div class="actions" style="flex-wrap:wrap">
-        <button class="btn bw" id="modelBtn">Ver modelo</button>
-        <button class="btn bg" id="clearBtn">Limpiar</button>
-        <button class="btn bc" id="checkGiveBtn">Revisar con IA ✦</button>
-        <button class="btn bd" id="nextGiveBtn">Siguiente →</button>
-      </div>
-      <div class="model-box" id="modelBox"></div>
     </div>
   </div>
+
+</aside>
 </div>
 
 <p style="text-align:center;color:#606090;font-size:.78rem;font-weight:700;margin:2px 0 0">By <span style="color:var(--magenta2)">Carlos & Denisse</span> · Your Mexican Friend</p>
@@ -295,12 +301,12 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
 
 // Cell size and map origin
 const CS = 130; // cell size px
-const OX = 60;  // left padding
-const OY = 60;  // top padding
+const OX = 80;  // left padding
+const OY = 90;  // top padding — extra space for top-row place labels
 const COLS_N = 6;
 const ROWS_N = 5;
-const MAP_W = OX + COLS_N * CS + OX;  // 840
-const MAP_H = OY + ROWS_N * CS + OY;  // 770
+const MAP_W = OX + COLS_N * CS + OX + 20;
+const MAP_H = OY + ROWS_N * CS + OY + 40;
 
 // Grid: col 0-6, row 0-5 → pixel x = OX + col*CS, y = OY + row*CS
 function gx(c){ return OX + c * CS; }
@@ -361,13 +367,13 @@ const SPECIALS = [
 // Places (destinations / waypoints) — positioned between intersections or at nodes
 const PLACES = [
   // top strip
-  {key:'estacion',   icon:'🚉', name:'Estación',    c:0, r:0, offX:-10, offY:-50},
-  {key:'banco',      icon:'🏦', name:'Banco',        c:2, r:0, offX:10,  offY:-50},
-  {key:'escuela',    icon:'🏫', name:'Escuela',      c:5, r:0, offX:0,   offY:-50},
+  {key:'estacion',   icon:'🚉', name:'Estación',    c:0, r:0, offX:-10, offY:-60},
+  {key:'banco',      icon:'🏦', name:'Banco',        c:2, r:0, offX:10,  offY:-60},
+  {key:'escuela',    icon:'🏫', name:'Escuela',      c:5, r:0, offX:0,   offY:-60},
   // row 1
   {key:'cafeteria',  icon:'☕', name:'Café',         c:1, r:1, offX:-60, offY:10},
   {key:'farmacia',   icon:'💊', name:'Farmacia',     c:4, r:1, offX:20,  offY:10},
-  {key:'museo',      icon:'🖼️', name:'Museo',        c:6, r:1, offX:10,  offY:-50},
+  {key:'museo',      icon:'🖼️', name:'Museo',        c:6, r:1, offX:10,  offY:-60},
   // row 2
   {key:'hospital',   icon:'🏥', name:'Hospital',     c:0, r:2, offX:-10, offY:10},
   {key:'biblioteca', icon:'📚', name:'Biblioteca',   c:5, r:2, offX:10,  offY:10},
@@ -376,7 +382,7 @@ const PLACES = [
   {key:'restaurante',icon:'🍽️', name:'Restaurante', c:6, r:3, offX:10,  offY:10},
   // row 4
   {key:'gimnasio',   icon:'🏋️', name:'Gimnasio',    c:0, r:4, offX:-10, offY:10},
-  {key:'teatro',     icon:'🎭', name:'Teatro',       c:3, r:4, offX:10,  offY:-50},
+  {key:'teatro',     icon:'🎭', name:'Teatro',       c:3, r:4, offX:10,  offY:-60},
   // row 5
   {key:'metro',      icon:'🚇', name:'Metro',        c:1, r:5, offX:-10, offY:20},
   {key:'mercado',    icon:'🛍️', name:'Mercado',      c:4, r:5, offX:10,  offY:20},
