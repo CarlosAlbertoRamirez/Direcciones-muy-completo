@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Misión Urbana A2 | Your Mexican Friend</title>
+<title>Misión CDMX A2 | Your Mexican Friend</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -65,6 +65,9 @@ body{font-family:var(--font);background:radial-gradient(ellipse at 12% 12%,rgba(
 .map-wrap{border:2px solid rgba(37,217,255,.15);border-radius:16px;overflow:auto;background:#0b0120;cursor:default;width:100%}
 .map-wrap>div{display:block;min-width:max-content}
 .map-wrap svg{display:block;max-width:none}
+/* Target pulsing highlight when all waypoints done */
+.target-ready rect{animation:targetPulse 1.1s ease-in-out infinite}
+@keyframes targetPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(34,197,94,0.3))}50%{filter:drop-shadow(0 0 14px rgba(34,197,94,0.9))}}
 
 @media(max-width:1100px){.main-row{grid-template-columns:1fr}.side-panel{position:static;max-height:none}}
 
@@ -147,6 +150,8 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
 @keyframes arrv{0%{transform:scale(1)}35%{transform:scale(1.38)}65%{transform:scale(.92)}100%{transform:scale(1)}}
 #avatarEl.wphit{animation:wph .4s ease}
 @keyframes wph{0%{transform:scale(1)}50%{transform:scale(1.28) rotate(6deg)}100%{transform:scale(1)}}
+#avatarEl.nearTarget{animation:nearPulse 1s ease-in-out infinite}
+@keyframes nearPulse{0%,100%{box-shadow:0 6px 16px rgba(0,0,0,.35),0 0 14px rgba(255,43,191,.3)}50%{box-shadow:0 6px 20px rgba(0,0,0,.4),0 0 28px rgba(34,197,94,.7),0 0 48px rgba(34,197,94,.3)}}
 
 @media(max-width:900px){.bottom{grid-template-columns:1fr}}
 @media(max-width:640px){.stats{gap:5px}.hero{padding:16px 14px}}
@@ -161,11 +166,11 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
   <div class="hero-in">
     <div class="logo" aria-hidden="true">YMF</div>
     <div class="hero-text">
-      <h1>Misión Urbana A2</h1>
-      <p>Navega por la ciudad. Sigue rutas continuas con rotondas, puentes, parques y más elementos urbanos.</p>
+      <h1>Misión CDMX A2</h1>
+      <p>Navega por la Ciudad de México. Sigue rutas por colonias reales, glorietas, puentes y más de la capital.</p>
       <div class="badges">
         <span class="badge c">Español A2</span>
-        <span class="badge">Rotondas · Puentes · Túneles</span>
+        <span class="badge">Reforma · Insurgentes · Juárez</span>
         <span class="badge">Instrucciones continuas</span>
         <span class="badge">Evaluación con IA</span>
       </div>
@@ -179,7 +184,7 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
 <section class="map-section" aria-label="Mapa interactivo de la ciudad">
   <div class="map-top">
     <div>
-      <h2 id="mapTitle" style="font-family:var(--display);font-size:1.1rem;font-weight:800">Ciudad Interactiva</h2>
+      <h2 id="mapTitle" style="font-family:var(--display);font-size:1.1rem;font-weight:800">Centro de la CDMX</h2>
       <p style="color:var(--muted);font-size:.72rem;margin-top:1px" id="mapMeta"></p>
     </div>
     <div class="tabs" role="tablist">
@@ -248,9 +253,9 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
       <div class="ctitle" style="margin-bottom:6px">Vocabulario de rutas</div>
       <div class="vocab">
         <span>sigue derecho</span><span>gira a la derecha</span><span>gira a la izquierda</span>
-        <span>da vuelta en la rotonda</span><span>cruza el puente</span><span>pasa el túnel</span>
+        <span>da vuelta en la glorieta</span><span>cruza el puente</span><span>entra al túnel</span>
         <span>camina N cuadras</span><span>cuando llegues a…</span><span>detente en…</span>
-        <span>al final de la calle</span><span>en la esquina de…</span><span>frente a…</span>
+        <span>al final de la calle</span><span>en la esquina de…</span><span>frente al Zócalo</span>
       </div>
     </div>
   </div>
@@ -280,7 +285,7 @@ textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(37,217,255,.08
       <div class="ctitle" style="margin-bottom:6px">Tu texto debe incluir</div>
       <div class="vocab">
         <span>Sal de…</span><span>Camina N cuadras</span><span>Gira a la derecha/izquierda</span>
-        <span>Da vuelta en la rotonda</span><span>Cruza el puente</span><span>Detente en…</span>
+        <span>Da vuelta en la glorieta</span><span>Cruza el puente</span><span>Detente en…</span>
       </div>
     </div>
   </div>
@@ -326,73 +331,82 @@ const NODES = {
   n04:{c:0,r:4}, n14:{c:1,r:4}, n24:{c:2,r:4}, n34:{c:3,r:4}, n44:{c:4,r:4}, n54:{c:5,r:4}, n64:{c:6,r:4},
   // row 5 (Av. Universidad)
   n05:{c:0,r:5}, n15:{c:1,r:5}, n25:{c:2,r:5}, n35:{c:3,r:5}, n45:{c:4,r:5}, n55:{c:5,r:5}, n65:{c:6,r:5},
+
+  // ── SPECIAL ELEMENTS mapped to their grid intersection ──
+  // Glorietas
+  glorieta_colon:      {c:3, r:1},   // Glorieta de Colón at 5 de Mayo × Av.Juárez
+  glorieta_cibeles:    {c:2, r:3},   // Glorieta de Cibeles
+  glorieta_insurgentes:{c:5, r:4},   // Glorieta Insurgentes
+  // Bridges
+  puente_alvarado: {c:3, r:2},       // Puente de Alvarado at 5 de Mayo × Av.Hidalgo
+  puente_tepito:   {c:5, r:4},       // Puente de Tepito
+  // Tunnel
+  tunel_eje:       {c:1, r:3},       // Túnel Eje Central, exits at Eje Central × Av.Madero
 };
 
-// Street names
+// Street names — CDMX inspired
 const H_STREETS = [
-  {r:0, name:'Av. del Sol'},
-  {r:1, name:'Av. Hidalgo'},
-  {r:2, name:'Av. Morelos'},
-  {r:3, name:'Av. Juárez'},
+  {r:0, name:'Paseo de la Reforma'},
+  {r:1, name:'Av. Juárez'},
+  {r:2, name:'Av. Hidalgo'},
+  {r:3, name:'Av. Madero'},
   {r:4, name:'Av. Insurgentes'},
   {r:5, name:'Av. Universidad'},
 ];
 const V_STREETS = [
-  {c:0, name:'C. Poniente'},
-  {c:1, name:'C. Norte'},
-  {c:2, name:'C. Roble'},
-  {c:3, name:'C. del Río'},
-  {c:4, name:'C. Flores'},
-  {c:5, name:'C. Oriente'},
-  {c:6, name:'C. Sur'},
+  {c:0, name:'Bucareli'},
+  {c:1, name:'Eje Central'},
+  {c:2, name:'Isabel la Católica'},
+  {c:3, name:'5 de Mayo'},
+  {c:4, name:'Av. 20 de Nov.'},
+  {c:5, name:'Pino Suárez'},
+  {c:6, name:'Circunvalación'},
 ];
 
-// Special urban elements (pixel position, type, label)
+// Special urban elements — CDMX landmarks
 const SPECIALS = [
-  // Roundabouts — at key intersections
-  {type:'roundabout', c:3, r:1, label:'Glorieta Hidalgo'},
-  {type:'roundabout', c:2, r:3, label:'Glorieta Juárez'},
+  // Glorietas / Roundabouts
+  {type:'roundabout', c:3, r:1, label:'Glorieta de Colón'},
+  {type:'roundabout', c:2, r:3, label:'Glorieta de Cibeles'},
   {type:'roundabout', c:5, r:4, label:'Glorieta Insurgentes'},
-  // Bridges — horizontal road segment between two cols
-  {type:'bridge', c1:2, c2:3, r:2, label:'Puente del Río'},
-  {type:'bridge', c1:4, c2:5, r:4, label:'Puente Flores'},
-  // Tunnel — vertical segment between two rows
-  {type:'tunnel', c:1, r1:2, r2:3, label:'Túnel Norte'},
-  // Park — fills a block (not on road)
-  {type:'park', c:4, r:0, label:'Parque Central'},
+  // Bridges
+  {type:'bridge', c1:2, c2:3, r:2, label:'Puente de Alvarado'},
+  {type:'bridge', c1:4, c2:5, r:4, label:'Puente de Tepito'},
+  // Tunnel
+  {type:'tunnel', c:1, r1:2, r2:3, label:'Túnel Eje Central'},
+  // Parks
+  {type:'park', c:4, r:0, label:'Bosque de Chapultepec'},
   // Plaza
-  {type:'plaza', c:0, r:2, label:'Plaza Cívica'},
+  {type:'plaza', c:0, r:2, label:'Plaza de la República'},
 ];
 
-// Places (destinations / waypoints) — positioned between intersections or at nodes
+// Places — CDMX landmarks and real locations
 const PLACES = [
-  // top strip
-  {key:'estacion',   icon:'🚉', name:'Estación',    c:0, r:0, offX:-10, offY:-60},
-  {key:'banco',      icon:'🏦', name:'Banco',        c:2, r:0, offX:10,  offY:-60},
-  {key:'escuela',    icon:'🏫', name:'Escuela',      c:5, r:0, offX:0,   offY:-60},
-  // row 1
-  {key:'cafeteria',  icon:'☕', name:'Café',         c:1, r:1, offX:-60, offY:10},
-  {key:'farmacia',   icon:'💊', name:'Farmacia',     c:4, r:1, offX:20,  offY:10},
-  {key:'museo',      icon:'🖼️', name:'Museo',        c:6, r:1, offX:10,  offY:-60},
-  // row 2
-  {key:'hospital',   icon:'🏥', name:'Hospital',     c:0, r:2, offX:-10, offY:10},
-  {key:'biblioteca', icon:'📚', name:'Biblioteca',   c:5, r:2, offX:10,  offY:10},
-  // row 3
-  {key:'hotel',      icon:'🏨', name:'Hotel',        c:3, r:3, offX:20,  offY:10},
-  {key:'restaurante',icon:'🍽️', name:'Restaurante', c:6, r:3, offX:10,  offY:10},
-  // row 4
-  {key:'gimnasio',   icon:'🏋️', name:'Gimnasio',    c:0, r:4, offX:-10, offY:10},
-  {key:'teatro',     icon:'🎭', name:'Teatro',       c:3, r:4, offX:10,  offY:-60},
-  // row 5
-  {key:'metro',      icon:'🚇', name:'Metro',        c:1, r:5, offX:-10, offY:20},
-  {key:'mercado',    icon:'🛍️', name:'Mercado',      c:4, r:5, offX:10,  offY:20},
-  {key:'aeropuerto', icon:'✈️', name:'Aeropuerto',  c:6, r:5, offX:10,  offY:20},
+  // Paseo de la Reforma (row 0)
+  {key:'estacion',    icon:'🚉', name:'Metro Hidalgo',                c:0, r:0, offX:-10, offY:-60},
+  {key:'banco',       icon:'🏦', name:'Banco BBVA',                   c:2, r:0, offX:10,  offY:-60},
+  {key:'escuela',     icon:'🏫', name:'Colegio Francés',              c:5, r:0, offX:0,   offY:-60},
+  // Av. Juárez (row 1)
+  {key:'cafeteria',   icon:'☕', name:'Café de Tacuba',               c:1, r:1, offX:-60, offY:10},
+  {key:'farmacia',    icon:'💊', name:'Farmacia Similares',           c:4, r:1, offX:20,  offY:10},
+  {key:'museo',       icon:'🖼️', name:'Museo Nac. de Arte',           c:6, r:1, offX:10,  offY:-60},
+  // Av. Hidalgo (row 2)
+  {key:'hospital',    icon:'🏥', name:'Hospital Juárez',              c:0, r:2, offX:-10, offY:10},
+  {key:'biblioteca',  icon:'📚', name:'Biblioteca Lerdo',             c:5, r:2, offX:10,  offY:10},
+  // Av. Madero (row 3)
+  {key:'hotel',       icon:'🏨', name:'Hotel Majestic',               c:3, r:3, offX:20,  offY:10},
+  {key:'restaurante', icon:'🍽️', name:'Rest. El Cardenal',            c:6, r:3, offX:10,  offY:10},
+  // Av. Insurgentes (row 4)
+  {key:'gimnasio',    icon:'🏋️', name:'Gimnasio Olímpico',            c:0, r:4, offX:-10, offY:10},
+  {key:'teatro',      icon:'🎭', name:'Teatro de la Ciudad',          c:3, r:4, offX:10,  offY:-60},
+  // Av. Universidad (row 5)
+  {key:'metro',       icon:'🚇', name:'Metro Zócalo',                 c:1, r:5, offX:-10, offY:20},
+  {key:'mercado',     icon:'🛍️', name:'Mercado Sonora',               c:4, r:5, offX:10,  offY:20},
+  {key:'aeropuerto',  icon:'✈️', name:'Aero. Benito Juárez',          c:6, r:5, offX:10,  offY:20},
 ];
 
 /* ═══════════════════════════════════════════════════
-   CHALLENGES — continuous GPS-style instructions
-   waypoints: visited in order BEFORE target
-   route: array of node keys the monito should traverse
+   CHALLENGES — rutas por la CDMX
 ═══════════════════════════════════════════════════ */
 const CHALLENGES = [
 
@@ -401,44 +415,44 @@ const CHALLENGES = [
   level:2, diff:2, xp:16,
   start:'n00', waypoints:['n41'], target:'n52',
   placeStart:'estacion', placeWaypoints:['farmacia'], placeTarget:'biblioteca',
-  text:`Llegas en tren a la <b>estación</b> y tu abuela te llama por teléfono. Necesita su medicina con urgencia. Sal de la estación y camina cuatro cuadras a la derecha por <b>Av. del Sol</b>. Vas a pasar el café, luego el banco, después C. Roble y finalmente llegas a <b>C. Flores</b>. En esa esquina, baja una cuadra por C. Flores hacia <b>Av. Hidalgo</b>. Ahí está la <em>farmacia</em> — entra, paga la medicina y guárdala bien en tu mochila. Cuando salgas de la farmacia, gira a la derecha y camina una cuadra más por Av. Hidalgo hasta llegar a <b>C. Oriente</b>. Ahí, al final de la calle, está la <em>biblioteca</em>. Tu abuela trabaja ahí y te espera. Dos paradas: farmacia primero, biblioteca después. ¿Puedes encontrar el camino?`,
-  hint:'Derecha 4 cuadras por Av. del Sol → C. Flores → baja 1 (farmacia) → derecha 1 (biblioteca).'
+  text:`Llegas al <b>Metro Hidalgo</b> y tu abuela te llama por teléfono — necesita su medicina urgente. Sal del metro y camina cuatro cuadras a la derecha por <b>Paseo de la Reforma</b>. Vas a pasar Banco BBVA, la escuela y finalmente llegas a <b>Av. 20 de Nov.</b>. En esa esquina, baja una cuadra hacia <b>Av. Juárez</b>. Ahí está la <em>Farmacia Similares</em> — entra, paga la medicina y guárdala en tu mochila. Cuando salgas, gira a la derecha y camina una cuadra más por Av. Juárez hasta <b>Pino Suárez</b>. Ahí está la <em>Biblioteca Lerdo</em>. Tu abuela trabaja ahí y te espera con un café. ¿Puedes encontrar el camino?`,
+  hint:'Derecha 4 por Reforma → Av.20 de Nov. → baja 1 (farmacia) → derecha 1 (Biblioteca Lerdo).'
 },
 
-/* ── MISIÓN 2 ── Nivel 2 · La Glorieta Hidalgo ── */
+/* ── MISIÓN 2 ── Nivel 2 · La Glorieta de Colón ── */
 {
   level:2, diff:2, xp:16,
   start:'n10', waypoints:['n31'], target:'n33',
-  placeStart:'cafeteria', placeWaypoints:['glorieta_hidalgo'], placeTarget:'hotel',
-  text:`Estás tomando un café en el <b>café</b>, en la esquina de C. Norte y Av. Hidalgo. Un amigo te manda un mensaje: "Te espero en el hotel, date prisa." Sal del café y camina dos cuadras a la derecha por <b>Av. Hidalgo</b>. Vas a pasar C. Roble y llegas a <b>C. del Río</b>. Aquí está la famosa <em>Glorieta Hidalgo</em>. Fíjate bien: en la glorieta debes dar vuelta y tomar la <b>primera salida hacia abajo</b>, que es C. del Río hacia el sur. Baja dos cuadras por C. del Río. Vas a cruzar Av. Morelos y llegas a <b>Av. Juárez</b>. Gira a la derecha en Av. Juárez y camina una cuadra. El <em>hotel</em> está justo en la esquina de Av. Juárez y C. del Río. Entra al lobby y busca a tu amigo en la recepción. ¡No llegues tarde!`,
-  hint:'Derecha 2 por Av. Hidalgo → Glorieta Hidalgo → baja 2 por C. del Río → derecha 1 (hotel).'
+  placeStart:'cafeteria', placeWaypoints:['glorieta_colon'], placeTarget:'hotel',
+  text:`Estás desayunando en el <b>Café de Tacuba</b>, en Eje Central y Av. Juárez. Un amigo te manda un mensaje: "Te espero en el hotel, ¡date prisa!" Sal del café y camina dos cuadras a la derecha por <b>Av. Juárez</b>. Vas a pasar Isabel la Católica y llegas a <b>5 de Mayo</b>. Aquí está la famosa <em>Glorieta de Colón</em>. Da vuelta en la glorieta y toma la <b>primera salida hacia abajo</b>, por 5 de Mayo hacia el sur. Baja dos cuadras. Vas a cruzar Av. Hidalgo y llegas a <b>Av. Madero</b>. Gira a la derecha y camina una cuadra. El <em>Hotel Majestic</em> está justo ahí, frente al Zócalo. ¡No llegues tarde!`,
+  hint:'Derecha 2 por Av. Juárez → Glorieta de Colón → baja 2 por 5 de Mayo → derecha 1 (Hotel Majestic).'
 },
 
-/* ── MISIÓN 3 ── Nivel 3 · El Puente del Río ── */
+/* ── MISIÓN 3 ── Nivel 3 · El Puente de Alvarado ── */
 {
   level:3, diff:3, xp:20,
   start:'n02', waypoints:['n32', 'n52'], target:'n53',
-  placeStart:'hospital', placeWaypoints:['puente_rio','biblioteca'], placeTarget:'hotel',
-  text:`Eres enfermero y sales del <b>hospital</b> con unos documentos importantes. Primero necesitas cruzar el río. Sal del hospital y camina dos cuadras a la derecha por <b>Av. Morelos</b>. Llegas a <b>C. del Río</b>: aquí empieza el <em>Puente del Río</em>. Crúzalo despacio — mira el agua debajo, el río es ancho y bonito. Cuando termines de cruzar el puente, sigues por Av. Morelos. Camina dos cuadras más a la derecha. Vas a pasar C. Flores y llegas a <b>C. Oriente</b>. Ahí, en esa esquina, está la <em>biblioteca</em>. Deja los documentos en la biblioteca — es muy importante. Cuando salgas, baja una cuadra por C. Oriente hasta <b>Av. Juárez</b>. Gira a la izquierda y camina una cuadra hacia C. Flores. El <em>hotel</em> está en esa esquina. Ve a descansar, ¡tienes un día largo!`,
-  hint:'Derecha 2 (puente) → derecha 2 más (biblioteca) → baja 1 → izquierda 1 (hotel).'
+  placeStart:'hospital', placeWaypoints:['puente_alvarado','biblioteca'], placeTarget:'hotel',
+  text:`Sales del <b>Hospital Juárez</b> con documentos importantes. Primero necesitas cruzar por Alvarado. Sal del hospital y camina dos cuadras a la derecha por <b>Av. Hidalgo</b>. Llegas a <b>5 de Mayo</b>: aquí está el <em>Puente de Alvarado</em>. Crúzalo con cuidado — hay mucho tráfico en esta zona. Cuando termines de cruzar, sigue por Av. Hidalgo. Camina dos cuadras más a la derecha hasta <b>Pino Suárez</b>. Ahí está la <em>Biblioteca Lerdo</em> — deja los documentos en recepción, es urgente. Cuando salgas, baja una cuadra por Pino Suárez hasta <b>Av. Madero</b>. Gira a la izquierda una cuadra. El <em>Hotel Majestic</em> está en esa esquina. Ve a descansar, ¡tienes un día muy largo!`,
+  hint:'Derecha 2 (Puente Alvarado) → derecha 2 más (Biblioteca Lerdo) → baja 1 → izquierda 1 (Hotel Majestic).'
 },
 
-/* ── MISIÓN 4 ── Nivel 3 · El Túnel Norte ── */
+/* ── MISIÓN 4 ── Nivel 3 · El Túnel Eje Central ── */
 {
   level:3, diff:3, xp:20,
-  start:'n12', waypoints:['n13'], target:'n23',
-  placeStart:'cafeteria', placeWaypoints:['tunel_norte'], placeTarget:'hotel',
-  text:`Sales del <b>café</b> en la esquina de C. Norte y Av. Morelos. Quieres ir al hotel pero hay mucho tráfico en la superficie. Una persona en la calle te dice: "Use el túnel, es más rápido." Buscas la entrada del <em>Túnel Norte</em> — está justo aquí, en C. Norte, debajo de la calle. Entra al túnel y camina una cuadra hacia abajo, por C. Norte, bajo tierra. Hay luces amarillas en el techo y el sonido de los pasos hace eco. Cuando salgas del otro lado del túnel llegas a <b>Av. Juárez</b>. Respira el aire fresco. Ahora gira a la derecha y camina una cuadra por Av. Juárez hacia <b>C. Roble</b>. El <em>hotel</em> está exactamente en esa esquina, con una entrada grande y un letrero luminoso. Entra y pregunta por tu habitación.`,
-  hint:'Entra al Túnel Norte → baja 1 cuadra bajo tierra → sale en Av. Juárez → derecha 1 (hotel).'
+  start:'n12', waypoints:['tunel_eje'], target:'n23',
+  placeStart:'cafeteria', placeWaypoints:['tunel_eje'], placeTarget:'hotel',
+  text:`Sales del <b>Café de Tacuba</b> en Eje Central y Av. Hidalgo. Quieres ir al Hotel Majestic pero hay tráfico terrible. Un señor en la banqueta te dice: "Usa el túnel del Eje, es más rápido." Buscas la entrada del <em>Túnel Eje Central</em> — está aquí mismo, bajo la calle. Entra y camina una cuadra hacia el sur, bajo tierra. Hay luces anaranjadas y el sonido del metro se escucha a lo lejos. Cuando salgas llegas a <b>Av. Madero</b> y el aire del Centro te recibe. Ahora gira a la derecha y camina una cuadra por Av. Madero hacia <b>Isabel la Católica</b>. El <em>Hotel Majestic</em> está en esa esquina, con su fachada colonial. Entra al lobby y pide tu habitación.`,
+  hint:'Baja por Túnel Eje Central → sale en Av. Madero → derecha 1 (Hotel Majestic).'
 },
 
-/* ── MISIÓN 5 ── Nivel 4 · Mañana con tres encargos ── */
+/* ── MISIÓN 5 ── Nivel 4 · Mañana en el Centro ── */
 {
   level:4, diff:4, xp:26,
   start:'n00', waypoints:['n20', 'n31', 'n32'], target:'n52',
-  placeStart:'estacion', placeWaypoints:['banco','glorieta_hidalgo','puente_rio'], placeTarget:'biblioteca',
-  text:`Son las ocho de la mañana. Llegas en el primer tren del día a la <b>estación</b> y tienes tres encargos antes de llegar a la biblioteca. Sal de la estación y camina dos cuadras a la derecha por <b>Av. del Sol</b>. Llegas a <b>C. Roble</b> — ahí está el <em>banco</em>. Entra, saca dinero y paga una factura importante. Cuando salgas del banco, baja una cuadra por C. Roble. Llegas a <b>Av. Hidalgo</b> — justo aquí está la <em>Glorieta Hidalgo</em>. Fíjate bien en los carros que circulan. Da vuelta en la rotonda y toma la salida hacia abajo, por <b>C. del Río</b>. Baja una cuadra por C. del Río. Llegas a <b>Av. Morelos</b>. Aquí está el <em>Puente del Río</em>. Crúzalo — el río está debajo y el viento es fresco por las mañanas. Cuando termines de cruzar, sigues por Av. Morelos. Camina dos cuadras más a la derecha, hasta <b>C. Oriente</b>. Sube una cuadra por C. Oriente hasta Av. Hidalgo. La <em>biblioteca</em> está ahí, en la esquina. Son las nueve de la mañana y el encargado ya abrió. ¡Tres paradas en orden: banco, glorieta, puente!`,
-  hint:'Derecha 2 (banco C.Roble) → baja 1 (glorieta C.del Río) → baja 1 (puente Av.Morelos) → derecha 2 → sube 1 (biblioteca).'
+  placeStart:'estacion', placeWaypoints:['banco','glorieta_colon','puente_alvarado'], placeTarget:'biblioteca',
+  text:`Son las ocho de la mañana en el <b>Metro Hidalgo</b>. Tienes tres paradas antes de llegar a la biblioteca. Sal y camina dos cuadras a la derecha por <b>Paseo de la Reforma</b> hasta <b>Isabel la Católica</b> — ahí está el <em>Banco BBVA</em>. Entra, saca dinero y paga tu factura del teléfono. Cuando salgas, baja una cuadra por Isabel la Católica hasta <b>Av. Juárez</b> — aquí está la <em>Glorieta de Colón</em>. Mucho movimiento a esta hora. Da vuelta en la glorieta y toma la salida hacia abajo por <b>5 de Mayo</b>. Baja una cuadra hasta <b>Av. Hidalgo</b>. Aquí está el <em>Puente de Alvarado</em>. Crúzalo — hay ciclistas y peatones. Cuando termines, sigue por Av. Hidalgo dos cuadras a la derecha hasta <b>Pino Suárez</b>. Sube una cuadra. La <em>Biblioteca Lerdo</em> está ahí, ya abrió. ¡Tres paradas en orden!`,
+  hint:'Derecha 2 (BBVA) → baja 1 (Glorieta Colón) → baja 1 (Puente Alvarado) → derecha 2 → sube 1 (Biblioteca Lerdo).'
 },
 
 /* ── MISIÓN 6 ── Nivel 4 · El vuelo urgente ── */
@@ -446,26 +460,26 @@ const CHALLENGES = [
   level:4, diff:4, xp:26,
   start:'n00', waypoints:['n04', 'n34'], target:'n65',
   placeStart:'estacion', placeWaypoints:['gimnasio','teatro'], placeTarget:'aeropuerto',
-  text:`Tu teléfono suena a las seis de la mañana. Es tu jefa: "¡El vuelo sale en dos horas! ¡Muévete!" Sal corriendo de la <b>estación</b>. Primero necesitas recoger tu maleta en el gimnasio — la dejaste ahí ayer. Baja cuatro cuadras por <b>C. Poniente</b>. Vas a cruzar Av. Hidalgo, después Av. Morelos, después Av. Juárez y llegas a <b>Av. Insurgentes</b>. El <em>gimnasio</em> está en esa esquina. Entra rápido, recoge la maleta del casillero número siete y sal. Ahora camina tres cuadras a la derecha por <b>Av. Insurgentes</b>. Llegas a la <em>Glorieta Insurgentes</em> — hay mucho tráfico. Da vuelta en la rotonda con cuidado y toma la primera salida hacia la derecha. Llegas frente al <em>teatro</em>. Aquí tienes que recoger los boletos de avión — los dejaste en taquilla. Entra, recógelos y confirma tu nombre. Cuando salgas del teatro, camina dos cuadras más a la derecha por Av. Insurgentes. Llegas a <b>C. Sur</b>. Baja una cuadra por C. Sur hacia <b>Av. Universidad</b>. El <em>aeropuerto</em> está al fondo, con las puertas de cristal y los aviones detrás. ¡Corre, que el avión no espera!`,
-  hint:'Baja 4 por C.Poniente (gimnasio) → derecha 3 por Av.Insurgentes (glorieta→teatro) → derecha 2 → baja 1 por C.Sur (aeropuerto).'
+  text:`Tu jefa te llama a las seis de la mañana: "¡El vuelo sale en dos horas!" Sal corriendo del <b>Metro Hidalgo</b>. Primero recoge tu maleta en el gimnasio. Baja cuatro cuadras por <b>Bucareli</b> — cruzas Av. Juárez, Av. Hidalgo, Av. Madero y llegas a <b>Av. Insurgentes</b>. El <em>Gimnasio Olímpico</em> está en esa esquina. Entra rápido, agarra la maleta del casillero 7 y sal. Camina tres cuadras a la derecha por <b>Av. Insurgentes</b>. Llegas a la <em>Glorieta Insurgentes</em> — hay peseros y taxis por todos lados. Da vuelta con cuidado y toma la primera salida a la derecha. Frente a ti está el <em>Teatro de la Ciudad</em>. Recoge tus boletos de avión en taquilla. Cuando salgas, camina dos cuadras más a la derecha. Llegas a <b>Circunvalación</b>. Baja una cuadra hasta <b>Av. Universidad</b>. El <em>Aero. Benito Juárez</em> está al fondo. ¡Apúrate!`,
+  hint:'Baja 4 por Bucareli (Gimnasio) → derecha 3 por Insurgentes (glorieta→Teatro) → derecha 2 → baja 1 por Circunvalación (Aero. Benito Juárez).'
 },
 
 /* ── MISIÓN 7 ── Nivel 5 · La ruta del mensajero ── */
 {
   level:5, diff:5, xp:36,
   start:'n60', waypoints:['n61', 'n31', 'n32', 'n52'], target:'n05',
-  placeStart:'museo', placeWaypoints:['farmacia','glorieta_hidalgo','puente_rio','biblioteca'], placeTarget:'metro',
-  text:`Eres mensajero y hoy tienes la ruta más larga de tu vida. Empiezas en el <b>museo</b>, en la esquina norte de C. Sur. Primero, baja una cuadra por <b>C. Sur</b> hasta <b>Av. Hidalgo</b>. Ahí, en esa esquina, está la <em>farmacia</em>. Entrega el paquete número uno — es una caja pequeña con vitaminas. Cuando salgas de la farmacia, camina cinco cuadras a la izquierda por <b>Av. Hidalgo</b>. Vas a pasar C. Flores, después C. del Río, y llegas a la <em>Glorieta Hidalgo</em>. Pon atención: en la glorieta, da vuelta en la rotonda y toma la salida hacia abajo, por <b>C. del Río</b>. Baja una cuadra por C. del Río hasta <b>Av. Morelos</b>. Aquí está el inicio del <em>Puente del Río</em>. Crúzalo despacio — el puente es angosto y hay ciclistas. Del otro lado del puente sigues por Av. Morelos. Camina dos cuadras a la derecha hasta <b>C. Oriente</b>. Sube una cuadra por C. Oriente. Llegas a la <em>biblioteca</em> — entrega el paquete número dos, son libros muy pesados. Descansa un momento. Cuando estés listo, baja dos cuadras por <b>C. Oriente</b> hasta <b>Av. Insurgentes</b>. Gira a la izquierda y camina cinco cuadras por Av. Insurgentes hacia <b>C. Poniente</b>. Baja dos cuadras por C. Poniente hasta <b>Av. Universidad</b>. Gira a la derecha y camina una cuadra. El <em>metro</em> está ahí. Entrega el último paquete al jefe de estación y termina tu turno. ¡Cuatro paradas, en orden, sin equivocarte!`,
-  hint:'Baja 1 (farmacia) → izquierda 5 Av.Hidalgo (glorieta) → baja 1 C.del Río (puente) → derecha 2 sube 1 (biblioteca) → baja 2 izquierda 5 baja 2 derecha 1 (metro).'
+  placeStart:'museo', placeWaypoints:['farmacia','glorieta_colon','puente_alvarado','biblioteca'], placeTarget:'metro',
+  text:`Eres mensajero y hoy tienes la ruta más larga de tu vida. Empiezas en el <b>Museo Nac. de Arte</b>, en Circunvalación norte. Primero baja una cuadra por <b>Circunvalación</b> hasta <b>Av. Juárez</b>. Ahí está la <em>Farmacia Similares</em>. Entrega la caja con medicamentos — es urgente. Sal y camina cinco cuadras a la izquierda por <b>Av. Juárez</b>. Pasas Pino Suárez, Av. 20 de Nov., y llegas a la <em>Glorieta de Colón</em>. Da vuelta y toma la salida hacia abajo por <b>5 de Mayo</b>. Baja una cuadra hasta <b>Av. Hidalgo</b>. Aquí está el <em>Puente de Alvarado</em>. Crúzalo — hay obras y mucho ruido. Cuando termines, sigue por Av. Hidalgo dos cuadras a la derecha hasta <b>Pino Suárez</b>. Sube una cuadra. Llegas a la <em>Biblioteca Lerdo</em> — entrega los libros, son muy pesados. Descansa un momento. Luego baja dos cuadras por Pino Suárez hasta <b>Av. Insurgentes</b>. Gira a la izquierda y camina cinco cuadras hacia <b>Bucareli</b>. Baja dos cuadras por Bucareli. Gira a la derecha una cuadra. El <em>Metro Zócalo</em> está ahí. ¡Cuatro paradas, en orden!`,
+  hint:'Baja 1 (Farmacia) → izquierda 5 Av.Juárez (Glorieta Colón) → baja 1 (Puente Alvarado) → derecha 2 sube 1 (Biblioteca Lerdo) → baja 2 izq. 5 baja 2 derecha 1 (Metro Zócalo).'
 },
 
-/* ── MISIÓN 8 ── Nivel 5 · La gran escapada ── */
+/* ── MISIÓN 8 ── Nivel 5 · Domingo chilango ── */
 {
   level:5, diff:5, xp:36,
   start:'n05', waypoints:['n04', 'n54', 'n51', 'n21'], target:'n00',
   placeStart:'metro', placeWaypoints:['gimnasio','mercado','restaurante','banco'], placeTarget:'estacion',
-  text:`Acabas de llegar en metro a la ciudad y tienes todo el día libre. Sal del <b>metro</b> en Av. Universidad esquina C. Poniente. Primero quieres hacer ejercicio — el <em>gimnasio</em> está a una cuadra de aquí. Sube una cuadra por <b>C. Poniente</b> hasta <b>Av. Insurgentes</b>. El gimnasio está en esa esquina. Haz ejercicio una hora. Cuando termines, camina cuatro cuadras a la derecha por <b>Av. Insurgentes</b> hasta <b>C. Oriente</b>. Ahí está el <em>mercado</em>. Entra y compra frutas, verduras y algo de queso para el camino. El mercado huele muy bien. Cuando termines de comprar, sube tres cuadras por <b>C. Oriente</b> hasta <b>Av. Hidalgo</b>. Gira a la izquierda. Camina tres cuadras por Av. Hidalgo hasta <b>C. Roble</b>. El <em>restaurante</em> está en esa esquina — come algo rico, tienes hambre después del gimnasio y el mercado. Pide el menú del día. Cuando termines de comer, camina una cuadra más a la izquierda por Av. Hidalgo hasta <b>C. Norte</b>. Sube una cuadra por C. Norte hasta <b>Av. del Sol</b>. Gira a la izquierda. Camina una cuadra. El <em>banco</em> está ahí — deposita el dinero del mercado que sobró. Finalmente, camina dos cuadras a la izquierda por <b>Av. del Sol</b>. La <em>estación</em> está al final, con el tren esperándote para regresar a casa. ¡Qué día tan completo!`,
-  hint:'Sube 1 (gimnasio) → derecha 4 Av.Insurgentes (mercado) → sube 3 C.Oriente, izquierda 3 Av.Hidalgo (restaurante) → izquierda 1 sube 1 izquierda 1 (banco) → izquierda 2 (estación).'
+  text:`Llegas al <b>Metro Zócalo</b> y tienes todo el domingo libre en la CDMX. Primero, sube una cuadra por <b>Bucareli</b> hasta <b>Av. Insurgentes</b>. El <em>Gimnasio Olímpico</em> está en esa esquina — haz ejercicio una hora. Luego camina cuatro cuadras a la derecha por <b>Av. Insurgentes</b> hasta <b>Pino Suárez</b>. Ahí está el <em>Mercado Sonora</em> — compra flores, yerbas y un antojito. Huele increíble. Sube tres cuadras por <b>Pino Suárez</b> hasta <b>Av. Juárez</b>. Gira a la izquierda y camina tres cuadras hasta <b>Isabel la Católica</b>. Ahí está <em>Rest. El Cardenal</em> — come pozole y un café de olla. Cuando termines, camina una cuadra más a la izquierda por Av. Juárez hasta <b>Eje Central</b>. Sube una cuadra por Eje Central hasta <b>Paseo de la Reforma</b>. Gira a la izquierda. Camina una cuadra. El <em>Banco BBVA</em> está ahí — deposita el cambio. Finalmente, camina dos cuadras a la izquierda por Reforma. El <em>Metro Hidalgo</em> está al final. ¡Qué domingo tan chilango!`,
+  hint:'Sube 1 (Gimnasio) → derecha 4 Insurgentes (Mercado Sonora) → sube 3 Pino Suárez, izquierda 3 (Rest. El Cardenal) → izquierda 1 sube 1 izquierda 1 (Banco BBVA) → izquierda 2 (Metro Hidalgo).'
 },
 
 ];
@@ -473,31 +487,31 @@ const CHALLENGES = [
 const GIVE_CHALLENGES = [
 {
   level:2, diff:2, xp:14,
-  from:'hospital', to:'farmacia', waypoints:['puente_rio'],
+  from:'hospital', to:'farmacia', waypoints:['puente_alvarado'],
   fromNode:'n02', toNode:'n41',
-  prompt:'Una persona sale del hospital con una receta médica. Necesita cruzar el Puente del Río para llegar a la farmacia. Escribe la ruta completa y continua, como si fuera un GPS: menciona las calles, el puente y el destino final. Usa frases largas y conectadas.',
-  model:'Sal del hospital en Av. Morelos esquina C. Poniente. Camina dos cuadras a la derecha por Av. Morelos. Llegas a C. del Río — aquí empieza el Puente del Río. Crúzalo despacio, el río está abajo. Cuando termines de cruzar, sigue por Av. Morelos una cuadra más a la derecha hasta C. Flores. Baja una cuadra por C. Flores hacia Av. Hidalgo. La farmacia está en esa esquina, con un letrero verde. Entra y entrega la receta.'
+  prompt:'Una persona sale del Hospital Juárez con una receta médica. Necesita cruzar el Puente de Alvarado para llegar a la Farmacia Similares. Escribe la ruta completa y continua, como si fuera un GPS por el Centro de la CDMX: menciona las calles, el puente y el destino. Usa frases largas y conectadas.',
+  model:'Sal del Hospital Juárez en Av. Hidalgo esquina Bucareli. Camina dos cuadras a la derecha por Av. Hidalgo. Llegas a 5 de Mayo — aquí empieza el Puente de Alvarado. Crúzalo con cuidado, hay mucho tráfico. Cuando termines de cruzar, sigue por Av. Hidalgo una cuadra más a la derecha hasta Av. 20 de Nov. Baja una cuadra por Av. 20 de Nov. hacia Av. Juárez. La Farmacia Similares está en esa esquina, con el letrero rojo. Entra y entrega la receta.'
 },
 {
   level:3, diff:3, xp:20,
-  from:'cafeteria', to:'teatro', waypoints:['glorieta_hidalgo'],
+  from:'cafeteria', to:'teatro', waypoints:['glorieta_colon'],
   fromNode:'n10', toNode:'n34',
-  prompt:'Un estudiante está en el café y quiere ir al teatro para ver una obra de noche. Debe pasar por la Glorieta Hidalgo. Escribe instrucciones largas, detalladas y continuas, como si le explicaras a alguien que no conoce la ciudad. Describe qué va a ver en cada punto.',
-  model:'Sal del café en la esquina de C. Norte y Av. Hidalgo. Camina dos cuadras a la derecha por Av. Hidalgo — vas a pasar la Plaza Cívica a tu izquierda. Cuando llegues a C. del Río, llegas a la Glorieta Hidalgo. Es una rotonda grande con una fuente en el centro. Da vuelta en la rotonda y toma la primera salida hacia abajo, que es C. del Río hacia el sur. Baja dos cuadras por C. del Río. Vas a cruzar Av. Morelos y llegas a Av. Insurgentes. Gira a la derecha. Camina una cuadra por Av. Insurgentes hasta C. del Río. El teatro está en esa esquina, con unas puertas grandes y un letrero de colores. La obra empieza a las ocho.'
+  prompt:'Un estudiante está en el Café de Tacuba y quiere ir al Teatro de la Ciudad para ver una obra. Debe pasar por la Glorieta de Colón. Escribe instrucciones largas y detalladas, como si le explicaras a alguien que visita la CDMX por primera vez. Describe qué va a ver en cada punto del camino.',
+  model:'Sal del Café de Tacuba en la esquina de Eje Central y Av. Juárez. Camina dos cuadras a la derecha por Av. Juárez — vas a pasar la Plaza de la República a tu izquierda. Cuando llegues a 5 de Mayo, ves la Glorieta de Colón. Es una glorieta grande con mucho tráfico. Da vuelta y toma la primera salida hacia abajo, por 5 de Mayo hacia el sur. Baja dos cuadras por 5 de Mayo. Vas a cruzar Av. Hidalgo y llegas a Av. Insurgentes. Gira a la derecha. Camina una cuadra por Av. Insurgentes hasta 5 de Mayo. El Teatro de la Ciudad está en esa esquina, con unas puertas grandes y un letrero luminoso. La obra empieza a las ocho.'
 },
 {
   level:4, diff:4, xp:24,
-  from:'estacion', to:'hotel', waypoints:['banco','glorieta_hidalgo'],
+  from:'estacion', to:'hotel', waypoints:['banco','glorieta_colon'],
   fromNode:'n00', toNode:'n33',
-  prompt:'Un turista llega en tren con mucho equipaje. Necesita ir al banco primero a cambiar dinero, después pasar por la Glorieta Hidalgo y finalmente llegar al hotel a descansar. Escribe instrucciones muy largas y claras con todos los detalles del camino: calles, cuadras, la glorieta, qué hacer en cada parada.',
-  model:'Sal de la estación en Av. del Sol esquina C. Poniente. Camina dos cuadras a la derecha por Av. del Sol — vas a pasar C. Norte y llegas a C. Roble. Ahí está el banco, en la esquina derecha. Entra y cambia tu dinero. Cuando salgas, baja una cuadra por C. Roble hacia Av. Hidalgo. Llegas a la Glorieta Hidalgo — hay taxis y mucho movimiento. Da vuelta en la rotonda y toma la salida hacia abajo, por C. del Río. Baja dos cuadras por C. del Río. Primero cruzas Av. Morelos y después llegas a Av. Juárez. El hotel está exactamente aquí, en la esquina de Av. Juárez y C. del Río. Tiene una entrada grande con un portero. Entra y pide tu habitación en la recepción.'
+  prompt:'Un turista extranjero llega al Metro Hidalgo con mucho equipaje. Necesita ir al Banco BBVA a cambiar dólares, después pasar por la Glorieta de Colón y finalmente llegar al Hotel Majestic a descansar. Escribe instrucciones muy detalladas con los nombres reales de calles de la CDMX: cuántas cuadras, en qué esquina está cada lugar y qué puede ver en el camino.',
+  model:'Sal del Metro Hidalgo en Paseo de la Reforma esquina Bucareli. Camina dos cuadras a la derecha por Paseo de la Reforma — vas a pasar Eje Central y llegas a Isabel la Católica. Ahí está el Banco BBVA, en la esquina derecha. Entra y cambia tu dinero. Cuando salgas, baja una cuadra por Isabel la Católica hacia Av. Juárez. Llegas a la Glorieta de Colón — hay taxis, microbuses y mucho movimiento. Da vuelta en la glorieta y toma la salida hacia abajo, por 5 de Mayo. Baja dos cuadras por 5 de Mayo. Primero cruzas Av. Hidalgo y después llegas a Av. Madero. El Hotel Majestic está exactamente aquí, en la esquina de Av. Madero y 5 de Mayo, frente al Zócalo. Tiene una entrada colonial muy bonita. Entra y pide tu habitación en la recepción.'
 },
 {
   level:5, diff:5, xp:32,
   from:'gimnasio', to:'aeropuerto', waypoints:['glorieta_insurgentes','teatro','mercado'],
   fromNode:'n04', toNode:'n65',
-  prompt:'Una persona sale del gimnasio con tres encargos antes de llegar al aeropuerto: pasar por la Glorieta Insurgentes, recoger un paquete en el teatro y comprar comida en el mercado. Escribe una ruta muy larga y detallada como si fuera un GPS con historia. Describe cada calle, cada vuelta, qué pasa en cada parada y cómo llega al aeropuerto al final.',
-  model:'Sal del gimnasio en Av. Insurgentes esquina C. Poniente. Camina tres cuadras a la derecha por Av. Insurgentes — vas a pasar C. Norte, C. Roble y llegas a C. del Río. Aquí está la Glorieta Insurgentes, una rotonda grande con árboles. Pon atención a los carros. Da vuelta en la rotonda y toma la primera salida hacia la derecha, que sigue por Av. Insurgentes hacia el este. Camina una cuadra. Llegas al teatro en la esquina de Av. Insurgentes y C. del Río. Entra a la taquilla y recoge el paquete con tu nombre. Cuando salgas, camina dos cuadras más a la derecha por Av. Insurgentes. Llegas a C. Oriente. Baja una cuadra por C. Oriente hacia Av. Universidad. El mercado está en esa esquina — entra y compra algo para comer en el avión. Cuando termines, camina una cuadra a la derecha por Av. Universidad. El aeropuerto está al final, con las puertas de cristal y los aviones que se ven al fondo. Muévete rápido, el vuelo sale pronto.'
+  prompt:'Una persona sale del Gimnasio Olímpico con tres encargos antes de llegar al Aero. Benito Juárez: pasar por la Glorieta Insurgentes, recoger un paquete en el Teatro de la Ciudad y comprar algo en el Mercado Sonora. Escribe una ruta muy larga y detallada como GPS por la CDMX. Menciona los nombres reales de calles, cuántas cuadras caminar, qué pasa en cada parada y cómo llega al aeropuerto al final.',
+  model:'Sal del Gimnasio Olímpico en Av. Insurgentes esquina Bucareli. Camina tres cuadras a la derecha por Av. Insurgentes — vas a pasar Eje Central, Isabel la Católica y llegas a 5 de Mayo. Aquí está la Glorieta Insurgentes, una glorieta grande con árboles y mucho movimiento. Da vuelta en la glorieta con cuidado y toma la primera salida hacia la derecha, que sigue por Av. Insurgentes. Camina una cuadra. Llegas al Teatro de la Ciudad en la esquina de Av. Insurgentes y 5 de Mayo. Entra a la taquilla, recoge el paquete con tu nombre y sal rápido. Cuando salgas, camina dos cuadras más a la derecha por Av. Insurgentes. Llegas a Pino Suárez. Baja una cuadra por Pino Suárez hacia Av. Universidad. El Mercado Sonora está en esa esquina — entra, compra un taco y algo para el viaje. Cuando termines, camina una cuadra a la derecha por Av. Universidad. El Aero. Benito Juárez está al fondo, con las puertas de vidrio y los aviones que se ven detrás. Date prisa, el vuelo no espera.'
 }
 ];
 
@@ -506,8 +520,8 @@ const DIFF_LABELS = {1:'⭐ Fácil',2:'⭐⭐ Básico',3:'⭐⭐⭐ Intermedio',
 /* ═══════════════════════════════════════════════════
    STATE
 ═══════════════════════════════════════════════════ */
-function loadSt(){try{return JSON.parse(localStorage.getItem('ymf_v4')||'null')}catch(e){return null}}
-function saveSt(){try{localStorage.setItem('ymf_v4',JSON.stringify({xp,streak,cIdx,gIdx}))}catch(e){}}
+function loadSt(){try{return JSON.parse(localStorage.getItem('ymf_cdmx1')||'null')}catch(e){return null}}
+function saveSt(){try{localStorage.setItem('ymf_cdmx1',JSON.stringify({xp,streak,cIdx,gIdx}))}catch(e){}}
 const sv = loadSt()||{};
 let xp=sv.xp||0, streak=sv.streak||0, cIdx=sv.cIdx||0, gIdx=sv.gIdx||0;
 let mode='follow', isDrag=false, isPlay=false;
@@ -808,17 +822,42 @@ function nearestGridNode(x,y){
 /* ═══════════════════════════════════════════════════
    WAYPOINT CHECK
 ═══════════════════════════════════════════════════ */
+// Friendly display names for special elements
+const SPECIAL_NAMES = {
+  glorieta_colon:      'Glorieta de Colón',
+  glorieta_cibeles:    'Glorieta de Cibeles',
+  glorieta_insurgentes:'Glorieta Insurgentes',
+  puente_alvarado:     'Puente de Alvarado',
+  puente_tepito:       'Puente de Tepito',
+  tunel_eje:           'Túnel Eje Central',
+};
+
+// For bridges and tunnels the player can trigger the checkpoint from EITHER end node
+const SPECIAL_EXTRA_NODES = {
+  puente_alvarado: [{c:2,r:2}],   // western entry
+  puente_tepito:   [{c:4,r:4}],   // western entry
+  tunel_eje:       [{c:1,r:2}],   // northern entry
+};
+
+function avatarAtNode(nd){
+  if(!nd)return false;
+  return avatarNode.c===nd.c && avatarNode.r===nd.r;
+}
+
 function checkWaypoints(ch){
-  // For follow challenges, waypoints are node keys like 'n31'
-  // We check if avatarNode matches that node
   let hit=false;
   ch.waypoints.forEach((wpKey,i)=>{
     if(wpDone[i])return;
     const prevOk=i===0||wpDone[i-1];
     if(!prevOk)return;
-    // parse node key
     const nd=NODES[wpKey];
-    if(nd&&avatarNode.c===nd.c&&avatarNode.r===nd.r){
+    // Check primary node
+    let passed=avatarAtNode(nd);
+    // Check extra nodes (bridge/tunnel alternate entry points)
+    if(!passed&&SPECIAL_EXTRA_NODES[wpKey]){
+      passed=SPECIAL_EXTRA_NODES[wpKey].some(en=>avatarAtNode(en));
+    }
+    if(passed){
       wpDone[i]=true; hit=true;
     }
   });
@@ -827,32 +866,62 @@ function checkWaypoints(ch){
     buildWpSidebar(ch,wpDone);
     avatarEl.classList.remove('wphit');void avatarEl.offsetWidth;avatarEl.classList.add('wphit');
     const nextIdx=wpDone.indexOf(false);
-    const nextLabel=nextIdx>=0?(ch.placeWaypoints||[])[nextIdx]:'el destino';
-    showFb('fb1','neu',`✅ <b>¡Parada visitada!</b> Ahora ve a: <b>${nextLabel||'el destino final'}</b>`);
+    let nextLabel='el destino final';
+    if(nextIdx>=0){
+      const rawKey=(ch.placeWaypoints||[])[nextIdx]||ch.waypoints[nextIdx];
+      nextLabel=SPECIAL_NAMES[rawKey]||rawKey;
+    }
+    showFb('fb1','neu',`✅ <b>¡Parada visitada!</b> Ahora ve a: <b>${nextLabel}</b>`);
+    // Pulse the destination on map when all waypoints are done
+    const allNowDone=wpDone.every(Boolean);
+    const targetG=mapSvg.querySelector(`.place-g[data-key="${ch.placeTarget}"]`);
+    if(targetG) targetG.classList.toggle('target-ready', allNowDone);
   }
 }
 
 /* ═══════════════════════════════════════════════════
    WAYPOINT SIDEBAR
 ═══════════════════════════════════════════════════ */
+// Friendly place names for display (covers PLACES keys + specials)
+const PLACE_NAMES = {
+  estacion:'Metro Hidalgo', banco:'Banco BBVA', escuela:'Colegio Francés',
+  cafeteria:'Café de Tacuba', farmacia:'Farmacia Similares', museo:'Museo Nac. de Arte',
+  hospital:'Hospital Juárez', biblioteca:'Biblioteca Lerdo',
+  hotel:'Hotel Majestic', restaurante:'Rest. El Cardenal',
+  gimnasio:'Gimnasio Olímpico', teatro:'Teatro de la Ciudad',
+  metro:'Metro Zócalo', mercado:'Mercado Sonora', aeropuerto:'Aero. Benito Juárez',
+  ...Object.fromEntries(Object.entries(SPECIAL_NAMES)),
+};
+function friendlyName(key){ return PLACE_NAMES[key]||SPECIAL_NAMES[key]||key; }
+
 function buildWpSidebar(ch,done){
   const list=$('wpList');
   list.innerHTML='';
+  const startName=friendlyName(ch.placeStart||ch.start);
+  const targetName=friendlyName(ch.placeTarget||ch.target);
   const all=[
-    {label:(ch.placeStart||ch.start)+' (inicio)', icon:'🟣', state:'done'},
+    {label:startName+' (inicio)', state:'done'},
     ...(ch.waypoints||[]).map((wp,i)=>{
-      const lbl=(ch.placeWaypoints&&ch.placeWaypoints[i])||wp;
-      return {label:lbl, icon:'🟡', state:done[i]?'done':done.slice(0,i).every(Boolean)?'active':'pending'};
+      const rawKey=(ch.placeWaypoints&&ch.placeWaypoints[i])||wp;
+      const lbl=friendlyName(rawKey);
+      return {label:lbl, state:done[i]?'done':done.slice(0,i).every(Boolean)?'active':'pending'};
     }),
-    {label:(ch.placeTarget||ch.target)+' (destino)', icon:'🔴', state:'final'}
+    {label:targetName+' (destino)', state:'final'}
   ];
-  all.forEach(item=>{
+  all.forEach((item,idx)=>{
     const div=document.createElement('div');
     div.className='wp-item'+(item.state==='done'?' done':item.state==='active'?' active':item.state==='final'?' final':'');
     const dot=document.createElement('div');
     dot.className='wp-dot '+(item.state==='done'?'dot-done':item.state==='active'?'dot-active':item.state==='final'?'dot-final':'dot-pend');
     const span=document.createElement('span');
-    span.textContent=item.label;
+    // Show step number for intermediate waypoints; lock if pending
+    if(item.state==='pending'){
+      span.textContent='🔒 '+item.label;
+    } else if(item.state==='done' && idx>0 && idx<all.length-1){
+      span.textContent='✓ '+item.label;
+    } else {
+      span.textContent=item.label;
+    }
     div.appendChild(dot);div.appendChild(span);
     list.appendChild(div);
   });
@@ -919,7 +988,13 @@ function speak(html){
   const plain=html.replace(/<[^>]+>/g,'');
   const u=new SpeechSynthesisUtterance(plain);
   u.lang='es-MX';u.rate=0.85;
-  u.onstart=()=>{isPlay=true;$('audioBtn').classList.add('pl');$('audioTxt').textContent='Pausar';};
+  u.onstart=()=>{
+    isPlay=true;
+    $('audioBtn').classList.add('pl');
+    $('audioTxt').textContent='Pausar';
+    // Scroll instruction card into view smoothly
+    $('instrCard')&&$('instrCard').scrollIntoView({behavior:'smooth',block:'nearest'});
+  };
   u.onend=u.onerror=stopSpeech;
   window.speechSynthesis.speak(u);
 }
@@ -943,6 +1018,13 @@ function loadFollow(){
   $('diffBadge').className='diff d'+ch.diff;
   $('fb1').className='fb';
   clearTrail();
+  // Reset check button to default state
+  const btn=$('checkBtn');
+  btn.textContent='✓ Revisar';
+  btn.classList.remove('bm');btn.classList.add('bc');
+  avatarEl.classList.remove('nearTarget');
+  // Clear any target-ready pulse from previous mission
+  mapSvg.querySelectorAll('.target-ready').forEach(el=>el.classList.remove('target-ready'));
 
   const sn=NODES[ch.start];
   positionAvatar(sn.c,sn.r);
@@ -950,6 +1032,9 @@ function loadFollow(){
   buildWpSidebar(ch,wpDone);
   buildPips(ch.level);
   updateStats(ch.level);
+  // Show mission number and waypoint count in subtitle
+  const total=ch.waypoints.length;
+  $('mapMeta').textContent=`Misión ${(cIdx%CHALLENGES.length)+1} de ${CHALLENGES.length} · ${total} parada${total!==1?'s':''} intermedia${total!==1?'s':''}`;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -972,16 +1057,16 @@ function checkFollow(){
     resetStreak();
     const missing=ch.waypoints.filter((_,i)=>!wpDone[i]);
     const mNames=missing.map(k=>{
-      const nd=NODES[k];
-      if(!nd)return k;
       const pl=(ch.placeWaypoints||[])[ch.waypoints.indexOf(k)];
-      return pl||k;
+      const raw=pl||k;
+      return SPECIAL_NAMES[raw]||raw;
     });
     showFb('fb1','bad',`<b>Llegaste al destino</b>, pero te faltaron paradas: <b>${mNames.join(', ')}</b>. Reinicia y visítalas en orden.`);
   }else{
     resetStreak();
     const pl=PLACES.find(p=>p.key===ch.placeTarget);
-    showFb('fb1','bad',`<b>Todavía no.</b> El destino final es <b>${pl?pl.icon+' '+pl.name:ch.target}</b>. Revisa también las paradas intermedias.`);
+    const targetLbl=pl?pl.icon+' '+pl.name:friendlyName(ch.placeTarget||ch.target);
+    showFb('fb1','bad',`<b>Todavía no.</b> El destino final es <b>${targetLbl}</b>. Revisa también las paradas intermedias.`);
   }
   updateStats(ch.level);
 }
@@ -997,7 +1082,25 @@ function moveAvatar(dir){
   if(dir==='left'&&c>0)c--;
   if(dir==='right'&&c<COLS_N)c++;
   positionAvatar(c,r,true);
-  checkWaypoints(CHALLENGES[cIdx%CHALLENGES.length]);
+  const ch=CHALLENGES[cIdx%CHALLENGES.length];
+  checkWaypoints(ch);
+  // Update check button hint
+  const tn=NODES[ch.target];
+  const allDone=wpDone.every(Boolean)||ch.waypoints.length===0;
+  const atTarget=tn&&c===tn.c&&r===tn.r;
+  // Near-target pulse: within 1 step of destination and all waypoints done
+  const nearTarget=allDone&&tn&&Math.abs(c-tn.c)+Math.abs(r-tn.r)<=1;
+  avatarEl.classList.toggle('nearTarget', nearTarget&&!atTarget);
+  const btn=$('checkBtn');
+  if(atTarget&&allDone){
+    btn.textContent='🎉 ¡Llegué!';
+    btn.classList.remove('bc');btn.classList.add('bm');
+    // Auto-celebrate if arrived at target with all waypoints done
+    checkFollow();
+  } else {
+    btn.textContent='✓ Revisar';
+    btn.classList.remove('bm');btn.classList.add('bc');
+  }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1021,7 +1124,13 @@ function endDrag(e){
   const x=e.clientX-svgRect.left, y=e.clientY-svgRect.top;
   const nd=nearestGridNode(x,y);
   positionAvatar(nd.c,nd.r,true);
-  checkWaypoints(CHALLENGES[cIdx%CHALLENGES.length]);
+  const ch=CHALLENGES[cIdx%CHALLENGES.length];
+  checkWaypoints(ch);
+  // Auto-check if player dragged to the final target
+  const tn=NODES[ch.target];
+  if(tn&&nd.c===tn.c&&nd.r===tn.r){
+    checkFollow();
+  }
 }
 avatarEl.addEventListener('pointerup',endDrag);
 avatarEl.addEventListener('pointercancel',endDrag);
@@ -1072,6 +1181,7 @@ function loadGive(){
   positionAvatar(sn.c,sn.r);
   buildPips(gc.level);
   updateStats(gc.level);
+  $('mapMeta').textContent=`Reto ${(gIdx%GIVE_CHALLENGES.length)+1} de ${GIVE_CHALLENGES.length} · De ${friendlyName(gc.from)} a ${friendlyName(gc.to)}`;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1087,14 +1197,18 @@ async function checkGive(){
   const hNames=H_STREETS.map(s=>s.name).join(', ');
   const vNames=V_STREETS.map(s=>s.name).join(', ');
   const specs=SPECIALS.map(s=>s.label).join(', ');
-  const wpStr=gc.waypoints.length?`Paradas intermedias requeridas: ${gc.waypoints.join(', ')}.`:'Sin paradas intermedias.';
+  const wpStr=gc.waypoints.length
+    ?`Paradas intermedias requeridas: ${gc.waypoints.map(w=>SPECIAL_NAMES[w]||friendlyName(w)).join(', ')}.`
+    :'Sin paradas intermedias.';
+  const fromName=friendlyName(gc.from);
+  const toName=friendlyName(gc.to);
 
-  const prompt=`Eres un profesor de español A2. Evalúa si el texto de un estudiante da una ruta válida y clara en una ciudad.
+  const prompt=`Eres un profesor de español A2. Evalúa si el texto de un estudiante da una ruta válida y clara por el Centro Histórico de la Ciudad de México (CDMX).
 
-CALLES HORIZONTALES: ${hNames}.
-CALLES VERTICALES: ${vNames}.
-ELEMENTOS ESPECIALES: ${specs}.
-RUTA PEDIDA: de "${gc.from}" a "${gc.to}". ${wpStr}
+AVENIDAS (horizontales): ${hNames}.
+CALLES (verticales): ${vNames}.
+ELEMENTOS ESPECIALES DEL MAPA: ${specs}.
+RUTA PEDIDA: de "${fromName}" a "${toName}". ${wpStr}
 
 TEXTO DEL ESTUDIANTE:
 """
@@ -1102,10 +1216,10 @@ ${txt}
 """
 
 Responde en español A2 (sencillo, máximo 5 oraciones). Indica:
-1. Si llega al destino correcto.
-2. Si menciona las paradas (${gc.waypoints.join(', ') || 'ninguna requerida'}).
-3. Si usa vocabulario de direcciones: caminar, girar, cruzar, dar vuelta, rotonda, puente, etc.
-4. Qué puede mejorar.
+1. Si llega al destino correcto (${toName}).
+2. Si menciona las paradas requeridas.
+3. Si usa vocabulario de direcciones de la CDMX: caminar, girar, cruzar, dar vuelta, glorieta, puente, túnel, cuadras, esquina, etc.
+4. Qué puede mejorar para sonar más natural.
 Termina con "✅ Excelente" o "💡 Casi, mejora un poco".`;
 
   try{
